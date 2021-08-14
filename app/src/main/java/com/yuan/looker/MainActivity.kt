@@ -7,7 +7,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.yuan.looker.ui.compose.MainUi
 import com.yuan.looker.ui.theme.LookerTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,22 +19,11 @@ class MainActivity : ComponentActivity() {
             LookerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    Greeting("Android")
+                    MainUi {
+                        Text(text = "Hello")
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    LookerTheme {
-        Greeting("Android")
     }
 }
