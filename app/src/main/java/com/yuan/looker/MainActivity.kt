@@ -1,29 +1,37 @@
 package com.yuan.looker
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import com.yuan.looker.ui.compose.MainUi
-import com.yuan.looker.ui.theme.LookerTheme
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.Serializer
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.yuan.looker.ui.Screen
+import com.yuan.looker.ui.compose.MainScreen
+import com.yuan.looker.ui.compose.SecondScreen
+import com.yuan.looker.ui.compose.TestScreen
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LookerTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    MainUi {
-                        Text(text = "Hello")
-                    }
-                }
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = Screen.MainScreen.route) {
+                composable(Screen.MainScreen.route) { MainScreen(navController = navController) }
+                composable(Screen.SecondScreen.route) { SecondScreen() }
+                composable(Screen.TestScreen.route) { TestScreen() }
             }
         }
+
     }
+
 }
