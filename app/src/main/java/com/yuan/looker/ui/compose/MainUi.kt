@@ -1,8 +1,9 @@
 package com.yuan.looker.ui.compose
 
 import android.annotation.SuppressLint
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -19,18 +20,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.viewpager2.widget.ViewPager2
 import com.yuan.looker.R
 import com.yuan.looker.ui.Screen
 import kotlinx.coroutines.*
-import kotlin.concurrent.thread
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
 
 
 @Composable
@@ -144,7 +146,10 @@ fun SecondScreen() {
 }
 
 @Composable
-fun TestScreen() {
+fun TestScreen(dataStore: DataStore<androidx.datastore.preferences.core.Preferences>) {
+    val scope = rememberCoroutineScope()
+    val testKey = stringPreferencesKey("test")
+
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         var key by remember {
             mutableStateOf("")
@@ -164,25 +169,25 @@ fun TestScreen() {
                 .fillMaxWidth()
                 .padding(10.dp)
         )
-        Button(onClick = { }) {
+        Button(onClick = {
+            scope.launch {
+                dataStore.edit {
+                        settings->
+                    settings[testKey] = dataValue
+                }
+            }
+        }) {
             Text(text = "save")
         }
-        TextField(
-            value = key,
-            onValueChange = { key = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-        )
-        TextField(
-            value = dataValue,
-            onValueChange = { dataValue = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-        )
-        Button(onClick = { }) {
-            Text(text = "save")
+        Button(onClick = {
+            scope.launch {
+                dataStore.edit {
+                    key = it[testKey].toString()
+                }
+            }
+
+        }) {
+            Text(text = "GetData")
         }
 
     }
