@@ -3,9 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Projects/OpenSource/Looker/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.346782431052094" />
         <entry key="..\:/Projects/OpenSource/Looker/app/src/main/res/drawable/ic_code_.xml" value="0.35188968335035753" />
         <entry key="..\:/Projects/OpenSource/Looker/app/src/main/res/drawable/ic_launcher_background.xml" value="0.35188968335035753" />
-        <entry key="..\:/Projects/OpenSource/Looker/app/src/main/res/drawable/ic_muntain.xml" value="0.33" />
+        <entry key="..\:/Projects/OpenSource/Looker/app/src/main/res/drawable/ic_muntain.xml" value="0.5" />
+        <entry key="..\:/Projects/OpenSource/Looker/app/src/main/res/drawable/ic_ocean.xml" value="0.5" />
       </map>
     </option>
   </component>

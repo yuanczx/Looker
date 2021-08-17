@@ -1,21 +1,27 @@
 package com.yuan.looker.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 
-private val DarkColorPalette = darkColors(
+val OrangeTheme = lightColors(
+    primary = Orange500,
+    primaryVariant = Orange700,
+    secondary = Orange200
+)
+val DarkColorPalette = darkColors(
     primary = Green500,
     primaryVariant = Green700,
-    secondary = Green500
+    secondary = Green200
 )
 
-private val LightColorPalette = lightColors(
+ val LightColorPalette = lightColors(
     primary = Green500,
     primaryVariant = Green700,
-    secondary = Green500
+    secondary = Green200
 
     /* Other default colors to override
     background = Color.White,
@@ -28,15 +34,10 @@ private val LightColorPalette = lightColors(
 )
 
 @Composable
-fun LookerTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
+inline fun  LookerTheme(theme:Colors= LightColorPalette, darkTheme: Boolean = isSystemInDarkTheme(), noinline content: @Composable() () -> Unit) {
 
     MaterialTheme(
-        colors = colors,
+        colors = if(darkTheme) DarkColorPalette else theme,
         typography = Typography,
         shapes = Shapes,
         content = content

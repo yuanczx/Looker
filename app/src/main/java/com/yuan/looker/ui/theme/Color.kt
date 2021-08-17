@@ -11,3 +11,8 @@ val Green500 = Color(0xFF1abc9c)
 val Green700 = Color(0xFF16a085)
 val Green200 = Color(0xFF83C7B9)
 
+val Orange700 = Color(0xfFFf6348)
+val Orange500 = Color(0xFFff7f50)
+val Orange200 = Color(0xFFFFB498)
+
+
