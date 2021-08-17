@@ -34,9 +34,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.yuan.looker.MainActivity
 import com.yuan.looker.R
+import com.yuan.looker.ui.Screen
 import com.yuan.looker.ui.Tab
 import com.yuan.looker.ui.theme.Green700
-import com.yuan.looker.ui.theme.OrangeTheme
 import kotlinx.coroutines.launch
 
 class MainScreen(val context: MainActivity) {
@@ -143,7 +143,9 @@ class MainScreen(val context: MainActivity) {
                         tint = Green700
                     )
                 }
-                IconButton(onClick = { context.myTheme.value = OrangeTheme }) {
+                IconButton(onClick = {
+                    context.navController.navigate(Screen.SettingScreen.route)
+                }) {
                     Icon(
                         imageVector = Icons.Outlined.Settings,
                         contentDescription = "Settings",
@@ -159,7 +161,7 @@ class MainScreen(val context: MainActivity) {
 
     @ExperimentalFoundationApi
     @Composable
-    fun Screen(navController: NavController) {
+    fun Screen() {
         val tabNavController = rememberNavController()
         val state = rememberScaffoldState()
         Scaffold(
@@ -170,7 +172,7 @@ class MainScreen(val context: MainActivity) {
             scaffoldState = state
         ) {
             NavHost(navController = tabNavController, startDestination = Tab.HomeTab.route) {
-                composable("homeTab") { HomeTab(navController = navController) }
+                composable("homeTab") { HomeTab() }
                 composable("shopTab") { ShopTab() }
                 composable(Tab.UserTab.route) { UserTab() }
             }
@@ -179,7 +181,7 @@ class MainScreen(val context: MainActivity) {
 
     @ExperimentalFoundationApi
     @Composable
-    fun HomeTab(navController: NavController) {
+    fun HomeTab() {
         var numbers by remember { mutableStateOf(100) }
         Column(
             Modifier
