@@ -3,6 +3,7 @@ package com.yuan.looker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
@@ -23,33 +24,47 @@ import com.yuan.looker.ui.screen.MainScreen
 import com.yuan.looker.ui.screen.SettingScreen
 import com.yuan.looker.ui.theme.LightColorPalette
 import com.yuan.looker.ui.theme.LookerTheme
+import com.yuan.looker.ui.theme.statusBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 
-class MainActivity : ComponentActivity() {
+
+val MainActivity.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
+
+class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
     lateinit var settingScreen: SettingScreen
     lateinit var navController: NavController
-    lateinit var myTheme:MutableState<Colors>
-    private val dataStore: DataStore<Preferences> by preferencesDataStore("settings")
+    lateinit var myTheme: MutableState<Colors>
+    var job: Job? = null
+
+    @ExperimentalAnimationApi
     @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-            //WindowCompat.setDecorFitsSystemWindows(window, false)
+        //WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             navController = rememberNavController()
             val mainScreen = MainScreen(this)
             settingScreen = SettingScreen(this)
             myTheme = remember { mutableStateOf(LightColorPalette) }
-              LookerTheme(myTheme.value) {
-                window.statusBarColor = MaterialTheme.colors.primary.toArgb()
-                  NavHost(
-                        navController = navController as NavHostController,
-                        startDestination = Screen.MainScreen.route
-                    ) {
-                        composable(Screen.MainScreen.route) { mainScreen.Screen() }
-                        composable(Screen.SettingScreen.route) { settingScreen.Screen() }
-                    }
+            LookerTheme(myTheme.value) {
+                window.statusBarColor = MaterialTheme.colors.statusBar.toArgb()
+                NavHost(
+                    navController = navController as NavHostController,
+                    startDestination = Screen.MainScreen.route
+                ) {
+                    composable(Screen.MainScreen.route) { mainScreen.Screen() }
+                    composable(Screen.SettingScreen.route) { settingScreen.Screen() }
+                }
             }
         }
     }
 
-    fun getDs(): DataStore<Preferences> = dataStore
+    override fun onDestroy() {
+        super.onDestroy()
+        cancel()
+    }
+
 }

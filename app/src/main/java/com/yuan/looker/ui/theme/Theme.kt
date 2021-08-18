@@ -6,6 +6,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 val OrangeTheme = lightColors(
     primary = Orange500,
@@ -15,7 +16,8 @@ val OrangeTheme = lightColors(
 val DarkColorPalette = darkColors(
     primary = Green500,
     primaryVariant = Green700,
-    secondary = Green200
+    secondary = Green200,
+    onSurface = Gray500
 )
 
  val LightColorPalette = lightColors(
@@ -32,10 +34,10 @@ val DarkColorPalette = darkColors(
     onSurface = Color.Black,
     */
 )
+val Colors.statusBar: Color @Composable get() = if (isLight) primary else DarkStatus
 
 @Composable
 inline fun  LookerTheme(theme:Colors= LightColorPalette, darkTheme: Boolean = isSystemInDarkTheme(), noinline content: @Composable() () -> Unit) {
-
     MaterialTheme(
         colors = if(darkTheme) DarkColorPalette else theme,
         typography = Typography,

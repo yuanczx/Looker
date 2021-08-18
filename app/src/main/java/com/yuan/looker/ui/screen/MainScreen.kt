@@ -117,7 +117,7 @@ class MainScreen(val context: MainActivity) {
                     .fillMaxWidth()
                     .height(180.dp)
                     .background(MaterialTheme.colors.secondary),
-                painter = painterResource(id = R.drawable.ic_ocean),
+                painter = painterResource(id = R.drawable.bg_ocean),
                 contentDescription = "Code",
                 contentScale = ContentScale.Crop
             )
