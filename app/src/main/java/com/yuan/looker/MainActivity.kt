@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -22,13 +23,9 @@ import androidx.navigation.compose.rememberNavController
 import com.yuan.looker.ui.Screen
 import com.yuan.looker.ui.screen.MainScreen
 import com.yuan.looker.ui.screen.SettingScreen
-import com.yuan.looker.ui.theme.LightColorPalette
-import com.yuan.looker.ui.theme.LookerTheme
-import com.yuan.looker.ui.theme.statusBar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
+import com.yuan.looker.ui.theme.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 
 
 val MainActivity.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
@@ -45,10 +42,20 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         super.onCreate(savedInstanceState)
         //WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
+            launch {
+                val themeIndex= dataStore.data.first()[intPreferencesKey("select")]?:0
+                myTheme.value=when(themeIndex){
+                    0-> LightColorPalette
+                    1-> OrangeTheme
+                    2-> BlueTheme
+                    else-> LightColorPalette
+                }
+            }
+            myTheme = remember { mutableStateOf(LightColorPalette) }
             navController = rememberNavController()
             val mainScreen = MainScreen(this)
             settingScreen = SettingScreen(this)
-            myTheme = remember { mutableStateOf(LightColorPalette) }
+
             LookerTheme(myTheme.value) {
                 window.statusBarColor = MaterialTheme.colors.statusBar.toArgb()
                 NavHost(

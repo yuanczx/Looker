@@ -8,6 +8,11 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
+val BlueTheme = lightColors(
+    primaryVariant = Blue700,
+    primary = Blue500,
+    secondary = Blue300
+)
 val OrangeTheme = lightColors(
     primary = Orange500,
     primaryVariant = Orange700,
@@ -35,7 +40,7 @@ val DarkColorPalette = darkColors(
     */
 )
 val Colors.statusBar: Color @Composable get() = if (isLight) primary else DarkStatus
-
+val Colors.settingBg :Color @Composable get() = if (isLight) Gray100 else DarkStatus
 @Composable
 inline fun  LookerTheme(theme:Colors= LightColorPalette, darkTheme: Boolean = isSystemInDarkTheme(), noinline content: @Composable() () -> Unit) {
     MaterialTheme(

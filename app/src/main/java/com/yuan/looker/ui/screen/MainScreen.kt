@@ -36,7 +36,6 @@ import com.yuan.looker.MainActivity
 import com.yuan.looker.R
 import com.yuan.looker.ui.Screen
 import com.yuan.looker.ui.Tab
-import com.yuan.looker.ui.theme.Green700
 import kotlinx.coroutines.launch
 
 class MainScreen(val context: MainActivity) {
@@ -132,7 +131,7 @@ class MainScreen(val context: MainActivity) {
                     Icon(
                         imageVector = Icons.Rounded.ExitToApp,
                         contentDescription = "Exit",
-                        tint = Green700
+                        tint = MaterialTheme.colors.primary
                     )
                 }
 
@@ -140,7 +139,7 @@ class MainScreen(val context: MainActivity) {
                     Icon(
                         imageVector = Icons.Outlined.FavoriteBorder,
                         contentDescription = "Favorite",
-                        tint = Green700
+                        tint = MaterialTheme.colors.primary
                     )
                 }
                 IconButton(onClick = {
@@ -149,7 +148,7 @@ class MainScreen(val context: MainActivity) {
                     Icon(
                         imageVector = Icons.Outlined.Settings,
                         contentDescription = "Settings",
-                        tint = Green700
+                        tint = MaterialTheme.colors.primary
                     )
                 }
             }
