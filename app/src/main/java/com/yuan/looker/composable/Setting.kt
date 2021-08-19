@@ -1,4 +1,4 @@
-package com.yuan.looker.ui
+package com.yuan.looker.composable
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
-class SettingUtils(
+class Setting(
     private val context: MainActivity
 ) {
     @SuppressLint("CoroutineCreationDuringComposition")

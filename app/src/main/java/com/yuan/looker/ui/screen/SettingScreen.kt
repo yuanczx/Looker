@@ -20,10 +20,11 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.yuan.looker.MainActivity
 import com.yuan.looker.R
-import com.yuan.looker.ui.SettingUtils
+import com.yuan.looker.composable.Setting
 import com.yuan.looker.ui.theme.BlueTheme
 import com.yuan.looker.ui.theme.LightColorPalette
 import com.yuan.looker.ui.theme.OrangeTheme
+import com.yuan.looker.ui.theme.PurpleTheme
 
 
 class SettingScreen(private val context: MainActivity) {
@@ -31,7 +32,7 @@ class SettingScreen(private val context: MainActivity) {
     @ExperimentalAnimationApi
     @Composable
     fun Screen() {
-        val settingUtils = SettingUtils(context)
+        val settingUtils = Setting(context)
         Column(modifier = Modifier.fillMaxSize()) {
             TopAppBar {
                 IconButton(onClick = {
@@ -51,7 +52,8 @@ class SettingScreen(private val context: MainActivity) {
                 icon = rememberVectorPainter(image = Icons.Outlined.Email),
                 label = "On Dark Theme"
             )
-            val themeSelector = listOf("青色", "橙色", "蓝色")
+            val themeSelector = listOf("青色", "橙色", "蓝色","紫色")
+
             settingUtils.Selector(
                 key = intPreferencesKey("select"),
                 title = "主题管理",
@@ -60,11 +62,12 @@ class SettingScreen(private val context: MainActivity) {
                 data = themeSelector,
                 iconSpaceReserve = true,
                 itemClick = {
-                    context.myTheme.value=when(it){
+                    context.theme=when(it){
                         0-> LightColorPalette
                         1-> OrangeTheme
                         2-> BlueTheme
-                        else-> LightColorPalette
+                        3-> PurpleTheme
+                        else-> context.theme
                     }
                      }
             )

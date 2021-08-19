@@ -1,9 +1,12 @@
 package com.yuan.looker.ui.screen
 
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
@@ -13,32 +16,36 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.ExitToApp
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.yuan.looker.MainActivity
 import com.yuan.looker.R
+import com.yuan.looker.splash
 import com.yuan.looker.ui.Screen
 import com.yuan.looker.ui.Tab
+import com.yuan.looker.ui.theme.Blue500
+import com.yuan.looker.ui.theme.Blue700
+import com.yuan.looker.ui.theme.Orange500
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainScreen(val context: MainActivity) {
+
     @Composable
     private fun MyTopBar(scaffoldState: ScaffoldState) {
         val scope = rememberCoroutineScope()
@@ -158,56 +165,84 @@ class MainScreen(val context: MainActivity) {
 
     }
 
+    @ExperimentalAnimationApi
     @ExperimentalFoundationApi
     @Composable
     fun Screen() {
         val tabNavController = rememberNavController()
         val state = rememberScaffoldState()
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = { MyTopBar(state) },
-            bottomBar = { MyBottomBar(tabNavController) },
-            drawerContent = { MyDrawer() },
-            scaffoldState = state
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+
         ) {
-            NavHost(navController = tabNavController, startDestination = Tab.HomeTab.route) {
-                composable("homeTab") { HomeTab() }
-                composable("shopTab") { ShopTab() }
-                composable(Tab.UserTab.route) { UserTab() }
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = { MyTopBar(state) },
+                    bottomBar = { MyBottomBar(tabNavController) },
+                    drawerContent = { MyDrawer() },
+                    scaffoldState = state
+                ) {
+                    NavHost(
+                        navController = tabNavController,
+                        startDestination = Tab.HomeTab.route
+                    ) {
+                        composable("homeTab") { HomeTab() }
+                        composable("shopTab") { ShopTab() }
+                        composable(Tab.UserTab.route) { UserTab() }
+                    }
+                }
             }
-        }
     }
 
     @ExperimentalFoundationApi
     @Composable
     fun HomeTab() {
         var numbers by remember { mutableStateOf(100) }
+        val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(bottom = 55.dp), horizontalAlignment = CenterHorizontally
         ) {
-            LazyVerticalGrid(
-                cells = GridCells.Fixed(3),
-                contentPadding = PaddingValues(vertical = 3.dp)
-            ) {
-                items(numbers) {
-                    Card(
-                        Modifier
-                            .size(120.dp)
-                            .padding(10.dp)
-                            .clickable { numbers += 10 },
-                        backgroundColor = MaterialTheme.colors.secondary,
-                        elevation = 5.dp,
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = CenterHorizontally,
-                            modifier = Modifier.fillMaxSize()
+            SwipeRefresh(
+                state = swipeRefreshState,
+                indicator = { state, trigger ->
+                    SwipeRefreshIndicator(
+                        state,
+                        trigger,
+                        contentColor = MaterialTheme.colors.primaryVariant
+                    )
+                },
+                onRefresh = {
+                    swipeRefreshState.isRefreshing = true
+                    context.launch {
+                        delay(3000)
+                        swipeRefreshState.isRefreshing = false
+                    }
+                }) {
+                LazyVerticalGrid(
+                    cells = GridCells.Fixed(3),
+                    contentPadding = PaddingValues(vertical = 3.dp)
+                ) {
+                    items(numbers) {
+                        Card(
+                            Modifier
+                                .size(120.dp)
+                                .padding(10.dp)
+                                .clickable { numbers += 10 },
+                            backgroundColor = MaterialTheme.colors.secondary,
+                            elevation = 5.dp,
                         ) {
-                            Text(text = "Hello world $it", color = Color.White)
-                        }
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = CenterHorizontally,
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                Text(text = "Hello world $it", color = Color.White)
+                            }
 
+                        }
                     }
                 }
             }
@@ -216,96 +251,46 @@ class MainScreen(val context: MainActivity) {
 
     @Composable
     fun ShopTab() {
-        Text(text = "This is shop tab")
+        Column(modifier = Modifier.fillMaxSize()) {
+            val judge = remember { mutableStateOf(false) }
+            val color by animateColorAsState(
+                if (judge.value) Blue700 else Orange500, animationSpec = tween(
+                    durationMillis = 2000
+                )
+            )
+            Box(modifier = Modifier
+                .background(color)
+                .clickable { judge.value = !judge.value }
+                .size(120.dp)) {}
+        }
     }
 
     @Composable
     fun UserTab() {
-        Text(text = "This is user tab")
-    }
-
-
-    @Composable
-    fun SecondScreen() {
-        Column(modifier = Modifier.fillMaxSize()) {
-
-            val isSt = remember {
-                mutableStateOf(false)
-            }
-            val progress by animateFloatAsState(
-                targetValue = if (isSt.value) 270f else 0f,
-                animationSpec = tween(
-                    durationMillis = 1000,
-                    delayMillis = 0,
-                    easing = FastOutLinearInEasing
-                )
-            )
-            Button(onClick = { isSt.value = !isSt.value }) {
-                Text(text = "Click")
-
-            }
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center)
-            {
-                Canvas(modifier = Modifier.size(120.dp)) {
-                    drawArc(
-                        color = Color.Black,
-                        startAngle = -90f,
-                        sweepAngle = progress,
-                        useCenter = false,
-                        style = Stroke(width = 10f, cap = StrokeCap.Round)
-                    )
-                }
-            }
-        }
+        TODO()
     }
 
     @Composable
-    fun TestScreen(dataStore: DataStore<androidx.datastore.preferences.core.Preferences>) {
-        val scope = rememberCoroutineScope()
-        val testKey = stringPreferencesKey("test")
-
+    fun Splash(splash: Boolean) {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = CenterHorizontally,
-
-            ) {
-            var key by remember {
-                mutableStateOf("")
-            }
-            var dataValue by remember { mutableStateOf("") }
-            OutlinedTextField(
-                value = key,
-                onValueChange = { key = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
+            modifier = if (splash) Modifier.size(0.dp) else Modifier
+                .fillMaxSize()
+                .background(Blue500),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = CenterHorizontally
+        ) {
+            Text(
+                text = "Looker",
+                fontSize = 50.sp,
+                fontWeight = FontWeight.W900,
+                textAlign = TextAlign.Center,
+                color = Color.White
             )
-            OutlinedTextField(
-                value = dataValue,
-                onValueChange = { dataValue = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-            )
-            Button(modifier = Modifier.padding(10.dp), onClick = {
-                scope.launch {
-                    dataStore.edit { settings ->
-                        settings[testKey] = dataValue
-                    }
-                }
-            }) {
-                Text(text = "Save Data")
+            context.launch {
+                delay(500)
+                context.splash = true
             }
-            Button(onClick = {
-                scope.launch {
-                    dataStore.edit {
-                        key = it[testKey].toString()
-                    }
-                }
-            }) {
-                Text(text = "Get Data")
-            }
-
         }
     }
 }
+
