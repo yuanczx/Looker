@@ -34,7 +34,6 @@ class Setting(
     @SuppressLint("CoroutineCreationDuringComposition")
     @Composable
     fun Switch(
-        modifier: Modifier = Modifier,//Modifier
         key: Preferences.Key<Boolean>,//DataStore key
         title: String = "",//标题
         icon: Painter? = null,//图标
@@ -52,7 +51,7 @@ class Setting(
         }
 
         //Compose界面
-        BasicSetting(icon, title, label, modifier, itemClick = {
+        BasicSetting(icon, title, label, itemClick = {
             switch = !switch
             writeData(key, switch)
         }) {
@@ -71,7 +70,7 @@ class Setting(
     }
 
     private fun writeData(key: Preferences.Key<Boolean>, switch: Boolean) {
-        context.launch {
+        context.launch { 
             context.dataStore.edit {
                 it[key] = switch
             }
@@ -83,7 +82,6 @@ class Setting(
     @ExperimentalAnimationApi
     @Composable
     fun Selector(
-        modifier: Modifier = Modifier,
         key: Preferences.Key<Int>,//DataStore key
         title: String,//标题
         data: List<String>,
@@ -112,7 +110,6 @@ class Setting(
                 icon = icon,
                 title = title,
                 label = label,
-                modifier = modifier,
                 iconSpaceReserve = iconSpaceReserve,
                 content = {
 
@@ -179,7 +176,6 @@ class Setting(
         icon: Painter?,
         title: String,
         label: String?,
-        modifier: Modifier,
         itemClick: (() -> Unit) = {},
         iconSpaceReserve: Boolean = true,
         content: @Composable () -> Unit = {}
