@@ -60,6 +60,6 @@ fun LookerTheme(
         colors = if (darkTheme) DarkColorPalette else theme,
         typography = Typography,
         shapes = Shapes,
-        content = content
+        content = content,
     )
 }

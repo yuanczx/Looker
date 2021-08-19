@@ -21,10 +21,13 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import com.yuan.looker.MainActivity
 import com.yuan.looker.R
 import com.yuan.looker.composable.Setting
+import com.yuan.looker.lookerTheme
 import com.yuan.looker.ui.theme.BlueTheme
 import com.yuan.looker.ui.theme.LightColorPalette
 import com.yuan.looker.ui.theme.OrangeTheme
 import com.yuan.looker.ui.theme.PurpleTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class SettingScreen(private val context: MainActivity) {
@@ -43,7 +46,7 @@ class SettingScreen(private val context: MainActivity) {
                         contentDescription = "Back"
                     )
                 }
-                Text(text = "设置", fontWeight = W600,fontSize = 20.sp)
+                Text(text = "设置", fontWeight = W600, fontSize = 20.sp)
             }
 
             settingUtils.Switch(
@@ -52,24 +55,29 @@ class SettingScreen(private val context: MainActivity) {
                 icon = rememberVectorPainter(image = Icons.Outlined.Email),
                 label = "On Dark Theme"
             )
-            val themeSelector = listOf("青色", "橙色", "蓝色","紫色")
-
+            val themeSelector = listOf("青色", "橙色", "蓝色")
+            val themeKey = intPreferencesKey("select")
             settingUtils.Selector(
-                key = intPreferencesKey("select"),
+                key = themeKey,
                 title = "主题管理",
                 icon = painterResource(id = R.drawable.ic_theme),
                 label = "选择你喜欢的颜色",
                 data = themeSelector,
                 iconSpaceReserve = true,
-                itemClick = {
-                    context.theme=when(it){
-                        0-> LightColorPalette
-                        1-> OrangeTheme
-                        2-> BlueTheme
-                        3-> PurpleTheme
-                        else-> context.theme
+                itemClick = { index ->
+                    context.launch {
+                        delay(10)
+                        context.lookerTheme = when (index) {
+                            0 -> LightColorPalette
+                            1 -> OrangeTheme
+                            2 -> BlueTheme
+                            3 -> PurpleTheme
+                            else -> LightColorPalette
+                        }
                     }
-                     }
+
+
+                }
             )
 
         }

@@ -42,7 +42,6 @@ class Setting(
 
     ) {
         //定义变量
-        val scope = rememberCoroutineScope()
         var switch by remember {
             mutableStateOf(false)
         }
@@ -71,11 +70,19 @@ class Setting(
 
     }
 
+    private fun writeData(key: Preferences.Key<Boolean>, switch: Boolean) {
+        context.launch {
+            context.dataStore.edit {
+                it[key] = switch
+            }
+        }
+    }
+
 
     @SuppressLint("CoroutineCreationDuringComposition")
     @ExperimentalAnimationApi
     @Composable
-    fun  Selector(
+    fun Selector(
         modifier: Modifier = Modifier,
         key: Preferences.Key<Int>,//DataStore key
         title: String,//标题
@@ -90,16 +97,13 @@ class Setting(
             mutableStateOf(false)
         }
 
-        val item = remember {
+        var item by remember {
             mutableStateOf(0)
-        }
-        val text = remember {
-            mutableStateOf(data[0])
         }
 
         context.launch {
-            item.value = readData(key)
-            text.value = data[item.value]
+            item = readData(key)
+            cancel()
         }
 
 
@@ -114,42 +118,50 @@ class Setting(
 
                     Spacer(modifier = Modifier.weight(0.7f))
                     OutlinedButton(
-                        modifier= Modifier
+                        modifier = Modifier
                             .height(30.dp)
                             .padding(end = 10.dp),
-                        border = BorderStroke(2.dp,MaterialTheme.colors.primary),
+                        border = BorderStroke(2.dp, MaterialTheme.colors.primary),
                         shape = RoundedCornerShape(45),
-                        onClick = {}){
-                        Text(text = text.value,fontSize = 13.sp,softWrap = true,maxLines = 1)
+                        onClick = {}) {
+                        Text(
+                            text = data[item],
+                            fontSize = 13.sp,
+                            softWrap = true,
+                            maxLines = 1
+                        )
                     }
                 },
                 itemClick = { visibility.value = !visibility.value })
+
             AnimatedVisibility(visible = visibility.value) {
                 Column(Modifier.background(MaterialTheme.colors.settingBg)) {
-                    fun click(index: Int) {
-                        item.value = index
-                        text.value = data[index]
-                        writeData(key, index)
-                        itemClick(index)
+                    fun rowClick(index:Int){
+                        item = index
+                        context.launch {
+                            context.dataStore.edit { it[key]=index }
+                            itemClick(index)
+                        }
                     }
-                    repeat(data.size) {
+                    repeat(data.size) { index ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .clickable {
-                                    click(it)
+                                           rowClick(index)
                                 },
                             //horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-                                selected = it == item.value,
-                                onClick = { click(it) })
+                                selected = index == item,
+                                onClick = { rowClick(index)
+                                })
                             Text(
                                 modifier = Modifier.padding(end = 10.dp),
-                                text = data[it],
+                                text = data[index],
                                 color = Gray500
                             )
                         }
@@ -221,26 +233,11 @@ class Setting(
 
     }
 
-    private fun writeData(key: Preferences.Key<Boolean>, value: Boolean) {
-        context.launch {
-            context.dataStore.edit { it[key] = value }
-            cancel()
-        }
-    }
-
-    private fun writeData(key: Preferences.Key<Int>, value: Int) {
-        context.launch {
-            context.dataStore.edit { it[key] = value }
-            cancel()
-        }
-    }
-
     private suspend fun readData(key: Preferences.Key<Int>) =
         context.dataStore.data.first()[key] ?: 0
 
     @JvmName("readData1")
     private suspend fun readData(key: Preferences.Key<Boolean>) =
         context.dataStore.data.first()[key] ?: false
-
 
 }

@@ -44,7 +44,7 @@ import com.yuan.looker.ui.theme.Orange500
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MainScreen(val context: MainActivity) {
+class MainScreen(private val context: MainActivity) {
 
     @Composable
     private fun MyTopBar(scaffoldState: ScaffoldState) {
@@ -98,7 +98,6 @@ class MainScreen(val context: MainActivity) {
                     tabNavController.navigate(Tab.ShopTab.route) {
                         launchSingleTop = true
                     }
-
                 }
             }, icon = {
                 Icon(imageVector = Icons.Outlined.ShoppingCart, contentDescription = "Home")
@@ -117,7 +116,11 @@ class MainScreen(val context: MainActivity) {
 
     @Composable
     private fun MyDrawer() {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = CenterHorizontally
+        ) {
             Image(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -130,7 +133,7 @@ class MainScreen(val context: MainActivity) {
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(0.9f)
                     .height(55.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -176,23 +179,23 @@ class MainScreen(val context: MainActivity) {
                 .fillMaxSize()
 
         ) {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    topBar = { MyTopBar(state) },
-                    bottomBar = { MyBottomBar(tabNavController) },
-                    drawerContent = { MyDrawer() },
-                    scaffoldState = state
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                topBar = { MyTopBar(state) },
+                bottomBar = { MyBottomBar(tabNavController) },
+                drawerContent = { MyDrawer() },
+                scaffoldState = state
+            ) {
+                NavHost(
+                    navController = tabNavController,
+                    startDestination = Tab.HomeTab.route
                 ) {
-                    NavHost(
-                        navController = tabNavController,
-                        startDestination = Tab.HomeTab.route
-                    ) {
-                        composable("homeTab") { HomeTab() }
-                        composable("shopTab") { ShopTab() }
-                        composable(Tab.UserTab.route) { UserTab() }
-                    }
+                    composable("homeTab") { HomeTab() }
+                    composable("shopTab") { ShopTab() }
+                    composable(Tab.UserTab.route) { UserTab() }
                 }
             }
+        }
     }
 
     @ExperimentalFoundationApi
@@ -247,6 +250,7 @@ class MainScreen(val context: MainActivity) {
                 }
             }
         }
+
     }
 
     @Composable

@@ -6,12 +6,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -35,17 +37,19 @@ import kotlinx.coroutines.launch
 val MainActivity.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
 var MainActivity.splash: Boolean by mutableStateOf(false)
 
+var MainActivity.lookerTheme by mutableStateOf(LightColorPalette)
 
 class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
 
-    var theme by mutableStateOf(LightColorPalette)
+
+    //var theme = mutableStateOf(LightColorPalette)
     lateinit var navController: NavHostController
 
     //初始化设置
     init {
         launch {
             val themeIndex = dataStore.data.first()[intPreferencesKey("select")] ?: 0
-            theme = when (themeIndex) {
+            lookerTheme = when (themeIndex) {
                 0 -> LightColorPalette
                 1 -> OrangeTheme
                 2 -> BlueTheme
@@ -54,7 +58,6 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
             }
         }
     }
-
 
     @SuppressLint("CoroutineCreationDuringComposition")
     @ExperimentalAnimationApi
@@ -68,17 +71,20 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
             navController = rememberNavController()
             val mainScreen = MainScreen(this)
             val settingScreen = SettingScreen(this)
+
             //Compose界面
             mainScreen.Splash(splash)
             AnimatedVisibility(
                 visible = splash,
-                enter = fadeIn(animationSpec = spring())
+                enter = fadeIn(animationSpec = tween(durationMillis = 500)),
             ) {
-                window.statusBarColor = theme.primary.toArgb()
-                LookerTheme(theme) {
+                //设置状态栏颜色
+                window.statusBarColor = lookerTheme.primary.toArgb()
+                LookerTheme(lookerTheme) {
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.MainScreen.route
+                        startDestination = Screen.MainScreen.route,
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         composable(Screen.MainScreen.route) { mainScreen.Screen() }
                         composable(Screen.SettingScreen.route) { settingScreen.Screen() }
