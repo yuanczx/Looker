@@ -1,6 +1,5 @@
 package com.yuan.looker
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +9,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -36,8 +36,8 @@ import kotlinx.coroutines.launch
 
 val MainActivity.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
 var MainActivity.splash: Boolean by mutableStateOf(false)
-
 var MainActivity.lookerTheme by mutableStateOf(LightColorPalette)
+
 
 class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
 
@@ -59,7 +59,6 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    @SuppressLint("CoroutineCreationDuringComposition")
     @ExperimentalAnimationApi
     @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,9 +77,9 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
                 visible = splash,
                 enter = fadeIn(animationSpec = tween(durationMillis = 500)),
             ) {
-                //设置状态栏颜色
-                window.statusBarColor = lookerTheme.primary.toArgb()
                 LookerTheme(lookerTheme) {
+                    //设置状态栏颜色
+                    window.statusBarColor = MaterialTheme.colors.statusBar.toArgb()
                     NavHost(
                         navController = navController,
                         startDestination = Screen.MainScreen.route,

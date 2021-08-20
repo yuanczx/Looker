@@ -1,12 +1,10 @@
 package com.yuan.looker.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
@@ -35,6 +33,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.yuan.looker.MainActivity
 import com.yuan.looker.R
+import com.yuan.looker.composable.WebCompo
 import com.yuan.looker.splash
 import com.yuan.looker.ui.Screen
 import com.yuan.looker.ui.Tab
@@ -269,9 +268,14 @@ class MainScreen(private val context: MainActivity) {
         }
     }
 
+    @SuppressLint("CoroutineCreationDuringComposition")
     @Composable
     fun UserTab() {
-        TODO()
+            WebCompo(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                context = context,
+                url = "https://yuanczx.github.io"
+            )
     }
 
     @Composable

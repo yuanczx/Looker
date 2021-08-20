@@ -17,18 +17,17 @@ val BlueTheme = lightColors(
 val PurpleTheme = lightColors(
     primaryVariant = Purple700,
     primary = Purple500,
-    secondary = Purple200
+    secondary = Purple200,
 )
 val OrangeTheme = lightColors(
     primary = Orange500,
     primaryVariant = Orange700,
-    secondary = Orange200
+    secondary = Orange200,
 )
 val DarkColorPalette = darkColors(
     primary = Green500,
     primaryVariant = Green700,
     secondary = Green200,
-    onSurface = Gray500
 )
 
 val LightColorPalette = lightColors(
@@ -36,7 +35,6 @@ val LightColorPalette = lightColors(
     primaryVariant = Green700,
     secondary = Green200
 )
-
 
 /* Other default colors to override
 background = Color.White,
@@ -47,14 +45,14 @@ onBackground = Color.Black,
 onSurface = Color.Black,
 */
 val Colors.statusBar: Color @Composable get() = if (isLight) primary else DarkStatus
-val Colors.settingBg: Color @Composable get() = if (isLight) Gray100 else DarkStatus
 
+val Colors.settingBg: Color @Composable get() = if (isLight) Gray100 else DarkStatus
 
 @Composable
 fun LookerTheme(
     theme: Colors = LightColorPalette,
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
     MaterialTheme(
         colors = if (darkTheme) DarkColorPalette else theme,
