@@ -3,8 +3,8 @@ package com.yuan.looker.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val Purple200 = Color(0xFFBB86FC)
-val Purple500 = Color(0xFF9b59b6)
-val Purple700 = Color(0xFF8e44ad)
+val Purple500 = Color(0xFF7437E3)
+val Purple700 = Color(0xFF7517D2)
 val Teal200 = Color(0xFF03DAC5)
 
 
@@ -15,11 +15,11 @@ val GreenOn = Color(0xFF79b12e)
 
 val Orange700 = Color(0xfFFf6348)
 val Orange500 = Color(0xFFff7f50)
-val Orange200 = Color(0xFFFFB498)
+val Orange200 = Color(0xFFFFB296)
 
 val Blue700 = Color(0xFF1e67bd)
 val Blue500 = Color(0xFF2172d2)
-val Blue300 = Color(0xFF61A0E9)
+val Blue300 = Color(0xFF84BDFF)
 
 
 val Gray700 = Color(0xFF4B4949)

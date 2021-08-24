@@ -28,9 +28,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
-class Setting(
-    private val context: MainActivity
-) {
+class Setting(private val context: MainActivity) {
     @SuppressLint("CoroutineCreationDuringComposition")
     @Composable
     fun Switch(
@@ -69,10 +67,49 @@ class Setting(
 
     }
 
-    private fun writeData(key: Preferences.Key<Boolean>, switch: Boolean) {
-        context.launch { 
-            context.dataStore.edit {
-                it[key] = switch
+    @SuppressLint("CoroutineCreationDuringComposition")
+    @ExperimentalAnimationApi
+    @Composable
+    fun Editor(
+        key: Preferences.Key<String>,
+        title: String,
+        icon: Painter? = null,
+        label: String? = null,
+        iconSpaceReserve: Boolean = true,
+        itemClick: () -> Unit = {}
+    ) {
+        var visiable by remember {
+            mutableStateOf(false)
+        }
+        var text by remember {
+            mutableStateOf("")
+        }
+        context.launch {
+            text = readData(key)
+        }
+        Column {
+            BasicSetting(
+                icon = icon,
+                title = title,
+                label = label,
+                iconSpaceReserve = iconSpaceReserve,
+                itemClick = {
+                    visiable = !visiable
+                    itemClick()
+                }) {}
+
+            AnimatedVisibility(visible = visiable) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .background(MaterialTheme.colors.settingBg),
+                    value = text,
+                    singleLine = true,
+                    onValueChange = {
+                        text = it
+                        writeData(key, it)
+                    })
             }
         }
     }
@@ -133,10 +170,10 @@ class Setting(
 
             AnimatedVisibility(visible = visibility.value) {
                 Column(Modifier.background(MaterialTheme.colors.settingBg)) {
-                    fun rowClick(index:Int){
+                    fun rowClick(index: Int) {
                         item = index
                         context.launch {
-                            context.dataStore.edit { it[key]=index }
+                            context.dataStore.edit { it[key] = index }
                             itemClick(index)
                         }
                     }
@@ -146,7 +183,7 @@ class Setting(
                                 .fillMaxWidth()
                                 .height(50.dp)
                                 .clickable {
-                                           rowClick(index)
+                                    rowClick(index)
                                 },
                             //horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
@@ -154,7 +191,8 @@ class Setting(
                             RadioButton(
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp),
                                 selected = index == item,
-                                onClick = { rowClick(index)
+                                onClick = {
+                                    rowClick(index)
                                 })
                             Text(
                                 modifier = Modifier.padding(end = 10.dp),
@@ -197,9 +235,9 @@ class Setting(
                         painter = it,
                         contentDescription = title,
                         modifier = Modifier
-                            .size(42.dp)
+                            .size(40.dp)
                             .padding(start = 10.dp),
-                        tint = Gray300
+                        tint = MaterialTheme.colors.secondary
                     )
                 }
                 //文字
@@ -223,10 +261,20 @@ class Setting(
         }
     }
 
+    private fun writeData(key: Preferences.Key<Boolean>, switch: Boolean) {
+        context.launch {
+            context.dataStore.edit {
+                it[key] = switch
+            }
+        }
+    }
 
-    //获取DataStore数据
-    companion object {
-
+    private fun writeData(key: Preferences.Key<String>, text: String) {
+        context.launch {
+            context.dataStore.edit {
+                it[key] = text
+            }
+        }
     }
 
     private suspend fun readData(key: Preferences.Key<Int>) =
@@ -236,4 +284,7 @@ class Setting(
     private suspend fun readData(key: Preferences.Key<Boolean>) =
         context.dataStore.data.first()[key] ?: false
 
+    @JvmName("readData2")
+    private suspend fun readData(key: Preferences.Key<String>) =
+        context.dataStore.data.first()[key] ?: ""
 }

@@ -30,7 +30,7 @@ val DarkColorPalette = darkColors(
     secondary = Green200,
 )
 
-val LightColorPalette = lightColors(
+val GreenTheme = lightColors(
     primary = Green500,
     primaryVariant = Green700,
     secondary = Green200
@@ -50,7 +50,7 @@ val Colors.settingBg: Color @Composable get() = if (isLight) Gray100 else DarkSt
 
 @Composable
 fun LookerTheme(
-    theme: Colors = LightColorPalette,
+    theme: Colors = BlueTheme,
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {

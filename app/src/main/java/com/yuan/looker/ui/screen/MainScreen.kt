@@ -6,8 +6,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -176,7 +175,6 @@ class MainScreen(private val context: MainActivity) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-
         ) {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
@@ -189,23 +187,26 @@ class MainScreen(private val context: MainActivity) {
                     navController = tabNavController,
                     startDestination = Tab.HomeTab.route
                 ) {
-                    composable("homeTab") { HomeTab() }
-                    composable("shopTab") { ShopTab() }
+                    composable(Tab.HomeTab.route) { HomeTab() }
+                    composable(Tab.ShopTab.route) { ShopTab() }
                     composable(Tab.UserTab.route) { UserTab() }
                 }
             }
         }
     }
 
+    @SuppressLint("CoroutineCreationDuringComposition")
     @ExperimentalFoundationApi
     @Composable
     fun HomeTab() {
-        var numbers by remember { mutableStateOf(100) }
+        //初始化变量
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
+        //Text(modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 60.dp),text = html)
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(bottom = 55.dp), horizontalAlignment = CenterHorizontally
+                .padding(bottom = 55.dp),
+            horizontalAlignment = CenterHorizontally
         ) {
             SwipeRefresh(
                 state = swipeRefreshState,
@@ -218,34 +219,8 @@ class MainScreen(private val context: MainActivity) {
                 },
                 onRefresh = {
                     swipeRefreshState.isRefreshing = true
-                    context.launch {
-                        delay(3000)
-                        swipeRefreshState.isRefreshing = false
-                    }
                 }) {
-                LazyVerticalGrid(
-                    cells = GridCells.Fixed(3),
-                    contentPadding = PaddingValues(vertical = 3.dp)
-                ) {
-                    items(numbers) {
-                        Card(
-                            Modifier
-                                .size(120.dp)
-                                .padding(10.dp)
-                                .clickable { numbers += 10 },
-                            backgroundColor = MaterialTheme.colors.secondary,
-                            elevation = 5.dp,
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = CenterHorizontally,
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                Text(text = "Hello world $it", color = Color.White)
-                            }
-
-                        }
-                    }
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 }
             }
         }
@@ -271,12 +246,13 @@ class MainScreen(private val context: MainActivity) {
     @SuppressLint("CoroutineCreationDuringComposition")
     @Composable
     fun UserTab() {
-            WebCompo(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                context = context,
-                url = "https://yuanczx.github.io"
-            )
+        WebCompo(
+            modifier = Modifier.verticalScroll(rememberScrollState()),
+            context = context,
+            url = "https://yuanczx.github.io"
+        )
     }
+
 
     @Composable
     fun Splash(splash: Boolean) {

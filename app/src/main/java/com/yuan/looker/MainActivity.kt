@@ -32,15 +32,16 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 
 
 val MainActivity.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
 var MainActivity.splash: Boolean by mutableStateOf(false)
-var MainActivity.lookerTheme by mutableStateOf(LightColorPalette)
+var MainActivity.lookerTheme by mutableStateOf(BlueTheme)
 
 
 class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
-
+    val client = OkHttpClient()
 
     //var theme = mutableStateOf(LightColorPalette)
     lateinit var navController: NavHostController
@@ -50,11 +51,11 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         launch {
             val themeIndex = dataStore.data.first()[intPreferencesKey("select")] ?: 0
             lookerTheme = when (themeIndex) {
-                0 -> LightColorPalette
+                0 -> BlueTheme
                 1 -> OrangeTheme
-                2 -> BlueTheme
+                2 -> GreenTheme
                 3 -> PurpleTheme
-                else -> LightColorPalette
+                else -> BlueTheme
             }
         }
     }
@@ -65,6 +66,9 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         super.onCreate(savedInstanceState)
         //WindowCompat.setDecorFitsSystemWindows(window, false) 取消状态栏占位
         window.statusBarColor = Blue500.toArgb()
+        launch {
+
+        }
         setContent {
             //变量声明
             navController = rememberNavController()
