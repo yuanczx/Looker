@@ -41,9 +41,8 @@ var MainActivity.lookerTheme by mutableStateOf(BlueTheme)
 
 
 class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
-    val client = OkHttpClient()
 
-    //var theme = mutableStateOf(LightColorPalette)
+    val client = OkHttpClient()
     lateinit var navController: NavHostController
 
     //初始化设置
@@ -66,11 +65,10 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         super.onCreate(savedInstanceState)
         //WindowCompat.setDecorFitsSystemWindows(window, false) 取消状态栏占位
         window.statusBarColor = Blue500.toArgb()
-        launch {
 
-        }
         setContent {
             //变量声明
+
             navController = rememberNavController()
             val mainScreen = MainScreen(this)
             val settingScreen = SettingScreen(this)

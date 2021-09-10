@@ -32,6 +32,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.yuan.looker.MainActivity
 import com.yuan.looker.R
+import com.yuan.looker.bean.News
 import com.yuan.looker.composable.WebCompo
 import com.yuan.looker.splash
 import com.yuan.looker.ui.Screen
@@ -39,6 +40,7 @@ import com.yuan.looker.ui.Tab
 import com.yuan.looker.ui.theme.Blue500
 import com.yuan.looker.ui.theme.Blue700
 import com.yuan.looker.ui.theme.Orange500
+import com.yuan.looker.utils.LookerMessage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -200,7 +202,20 @@ class MainScreen(private val context: MainActivity) {
     @Composable
     fun HomeTab() {
         //初始化变量
+        var index = 0
+        var itemNums by remember { mutableStateOf(0) }
+        var newsList by remember { mutableStateOf(listOf(News("", ""))) }
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
+        val lookerMessage = LookerMessage(context)
+        fun loadNews() {
+            lookerMessage.getNews("https://c.m.163.com/nc/article/headline/T1348647853363/${index}-10.html") {
+                index += 10
+                newsList = newsList + it
+                itemNums = newsList.size
+            }
+            swipeRefreshState.isRefreshing = false
+        }
+        loadNews()
         //Text(modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 60.dp),text = html)
         Column(
             Modifier
@@ -219,8 +234,12 @@ class MainScreen(private val context: MainActivity) {
                 },
                 onRefresh = {
                     swipeRefreshState.isRefreshing = true
+                    loadNews()
                 }) {
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    items(itemNums) {
+                        Text(text = newsList[it].title)
+                    }
                 }
             }
         }
