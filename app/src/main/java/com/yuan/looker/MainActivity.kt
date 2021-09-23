@@ -3,6 +3,7 @@ package com.yuan.looker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -27,12 +28,12 @@ import com.yuan.looker.ui.Screen
 import com.yuan.looker.ui.screen.MainScreen
 import com.yuan.looker.ui.screen.SettingScreen
 import com.yuan.looker.ui.theme.*
+import com.yuan.looker.viewmodel.NewsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
 
 
 val MainActivity.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
@@ -41,10 +42,8 @@ var MainActivity.lookerTheme by mutableStateOf(BlueTheme)
 
 
 class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
-
-    val client = OkHttpClient()
     lateinit var navController: NavHostController
-
+    private val viewModel by viewModels<NewsViewModel>()
     //初始化设置
     init {
         launch {
@@ -59,16 +58,15 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    @ExperimentalAnimationApi
     @ExperimentalFoundationApi
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //WindowCompat.setDecorFitsSystemWindows(window, false) 取消状态栏占位
         window.statusBarColor = Blue500.toArgb()
-
+        viewModel.loadHeadline()
         setContent {
             //变量声明
-
             navController = rememberNavController()
             val mainScreen = MainScreen(this)
             val settingScreen = SettingScreen(this)
