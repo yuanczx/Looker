@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Looker</string>
+    <string name="refresh_success">刷新成功</string>
+    <string name="internet_error">无网络连接</string>
 </resources>

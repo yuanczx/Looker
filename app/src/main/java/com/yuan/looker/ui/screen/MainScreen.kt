@@ -1,6 +1,7 @@
 package com.yuan.looker.ui.screen
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -10,7 +11,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -31,14 +31,16 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.annotation.ExperimentalCoilApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.yuan.looker.MainActivity
 import com.yuan.looker.R
-import com.yuan.looker.splash
+import com.yuan.looker.activity.MainActivity
+import com.yuan.looker.activity.splash
+import com.yuan.looker.composable.NewsList
 import com.yuan.looker.ui.Screen
-import com.yuan.looker.ui.Tab
+import com.yuan.looker.ui.Tabs
 import com.yuan.looker.ui.theme.Blue500
 import com.yuan.looker.ui.theme.Blue700
 import com.yuan.looker.ui.theme.Orange500
@@ -47,13 +49,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainScreen(private val context: MainActivity) {
-    private val vm by context.viewModels<NewsViewModel>()
+    //获取ViewModel
+    private val viewModel by context.viewModels<NewsViewModel>()
+
     @Composable
     private fun MyTopBar(scaffoldState: ScaffoldState) {
         val scope = rememberCoroutineScope()
-        TopAppBar {
+        TopAppBar(elevation = 0.dp) {
             IconButton(onClick = {
                 scope.launch {
+                    //开启（关闭）Drawer
                     if (scaffoldState.drawerState.isOpen)
                         scaffoldState.drawerState.close()
                     else scaffoldState.drawerState.open()
@@ -85,8 +90,15 @@ class MainScreen(private val context: MainActivity) {
                 if (selectedTab != 1) {
                     selectedTab = 1
                     tabNavController.backQueue.removeLast()
-                    tabNavController.navigate(Tab.HomeTab.route) {
+                    tabNavController.navigate(Tabs.HomeTab.route) {
                         launchSingleTop = true
+                    }
+                    if (!viewModel.load) {
+                        context.launch {
+                            viewModel.load = true
+                            delay(1000)
+                            viewModel.load = false
+                        }
                     }
                 }
 
@@ -97,7 +109,7 @@ class MainScreen(private val context: MainActivity) {
                 if (selectedTab != 2) {
                     selectedTab = 2
                     tabNavController.backQueue.removeLast()
-                    tabNavController.navigate(Tab.ShopTab.route) {
+                    tabNavController.navigate(Tabs.ShopTab.route) {
                         launchSingleTop = true
                     }
                 }
@@ -108,7 +120,7 @@ class MainScreen(private val context: MainActivity) {
                 if (selectedTab != 3) {
                     selectedTab = 3
                     tabNavController.backQueue.removeLast()
-                    tabNavController.navigate(Tab.UserTab.route)
+                    tabNavController.navigate(Tabs.UserTab.route)
                 }
             }, icon = {
                 Icon(imageVector = Icons.Outlined.AccountCircle, contentDescription = "Home")
@@ -170,6 +182,7 @@ class MainScreen(private val context: MainActivity) {
 
     }
 
+    @ExperimentalCoilApi
     @ExperimentalAnimationApi
     @ExperimentalFoundationApi
     @Composable
@@ -189,23 +202,23 @@ class MainScreen(private val context: MainActivity) {
             ) {
                 NavHost(
                     navController = tabNavController,
-                    startDestination = Tab.HomeTab.route
+                    startDestination = Tabs.HomeTab.route
                 ) {
-                    composable(Tab.HomeTab.route) { HomeTab() }
-                    composable(Tab.ShopTab.route) { ShopTab() }
-                    composable(Tab.UserTab.route) { UserTab() }
+                    composable(Tabs.HomeTab.route) { HomeTab() }
+                    composable(Tabs.ShopTab.route) { ShopTab() }
+                    composable(Tabs.UserTab.route) { UserTab() }
                 }
             }
         }
     }
 
+    @ExperimentalCoilApi
     @SuppressLint("CoroutineCreationDuringComposition")
     @ExperimentalFoundationApi
     @Composable
     fun HomeTab() {
         //初始化变量
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
-
         //Text(modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 60.dp),text = html)
         Column(
             Modifier
@@ -224,19 +237,87 @@ class MainScreen(private val context: MainActivity) {
                 },
                 onRefresh = {
                     swipeRefreshState.isRefreshing = true
-                    vm.loadHeadline()
-                    swipeRefreshState.isRefreshing = false
+                    context.launch {
+                        viewModel.newsIndex = 0
+                        viewModel.loadNews(0)
+                        swipeRefreshState.isRefreshing = false
+                        Toast.makeText(
+                            context,
+                            context.resources.getString(R.string.refresh_success),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
                 }) {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    vm.headline?.let { list->
-                        items(list.size){
-                            Text(text = list[it].title)
+                var selectedTab by remember {
+                    mutableStateOf(0)
+                }
+                Column(Modifier.fillMaxSize()) {
+                    TabRow(selectedTabIndex = selectedTab) {
+                        Tab(
+                            selected = selectedTab == 0,
+                            onClick = {
+                                if (selectedTab != 0) {
+                                    selectedTab = 0
+                                    viewModel.newsIndex = 0
+                                    context.launch { viewModel.loadNews(0) }
+                                }
+                            },
+                            text = { Text(text = "头条") })
+                        Tab(
+                            selected = selectedTab == 1,
+                            onClick = {
+                                if (selectedTab != 1) {
+                                    selectedTab = 1
+                                    viewModel.newsIndex = 0
+                                    context.launch { viewModel.loadNews(1) }
+
+                                }
+                            },
+                            text = { Text(text = "精选") })
+                        Tab(
+                            selected = selectedTab == 2,
+                            onClick = { selectedTab = 2 },
+                            text = { Text(text = "科技") })
+                    }
+                    var isLoading by remember { mutableStateOf(false) }
+                    viewModel.news?.let { newsList ->
+//                        LazyColumn{
+//                            items(newsList){item ->
+//                                Row(
+//                                    Modifier
+//                                        .fillMaxWidth()
+//                                        .height(120.dp)) {
+//                                    val painter = item.imgsrc.replace("http","https")
+//                                    Image(painter = rememberImagePainter(data = painter), contentDescription = "")
+//                                    Text(text = item.title,modifier = Modifier
+//                                        .fillMaxWidth()
+//                                        .height(120.dp))
+//                                }
+//
+//                            }
+//                        }
+                        NewsList(
+                            newscast = newsList,
+                            lastEvent = if (viewModel.load) null else { isLast ->
+                                context.launch {
+                                    if (viewModel.newsIndex < 440) {
+                                        if (isLoading) return@launch
+                                        isLoading = true
+                                        if (isLast) viewModel.loadNews(selectedTab)
+                                        isLoading = false
+                                    }
+                                }
+                            })
+                        {
+                            context.navController.navigate(Screen.ReadScreen.route)
                         }
                     }
+
                 }
+
             }
         }
-
     }
 
     @Composable
@@ -255,7 +336,6 @@ class MainScreen(private val context: MainActivity) {
         }
     }
 
-    @SuppressLint("CoroutineCreationDuringComposition")
     @Composable
     fun UserTab() {
         Text(text = "User Tab")

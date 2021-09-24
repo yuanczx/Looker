@@ -13,14 +13,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import com.yuan.looker.MainActivity
-import com.yuan.looker.dataStore
-import com.yuan.looker.ui.theme.Gray300
+import com.yuan.looker.activity.MainActivity
+import com.yuan.looker.activity.dataStore
 import com.yuan.looker.ui.theme.Gray500
 import com.yuan.looker.ui.theme.settingBg
 import kotlinx.coroutines.cancel
@@ -31,34 +29,37 @@ import kotlinx.coroutines.launch
 class Setting(private val context: MainActivity) {
     @SuppressLint("CoroutineCreationDuringComposition")
     @Composable
-    fun Switch(
+    fun Switcher(
         key: Preferences.Key<Boolean>,//DataStore key
         title: String = "",//标题
         icon: Painter? = null,//图标
-        label: String? = null//标签
-
+        label: String? = null,//标签
+        itemClick: suspend (Boolean) -> Unit={}
     ) {
         //定义变量
-        var switch by remember {
-            mutableStateOf(false)
-        }
+        val switch = remember { mutableStateOf(false) }
         //获取DataStore数据
         context.launch {
-            switch = readData(key)
-            cancel()
+            switch.value = context.dataStore.data.first()[key]?:false
         }
 
         //Compose界面
         BasicSetting(icon, title, label, itemClick = {
-            switch = !switch
-            writeData(key, switch)
+            switch.value = !switch.value
+            context.launch {
+                context.dataStore.edit {
+                    it[key] = switch.value
+                    itemClick(switch.value)
+                }
+            }
         }) {
             Switch(
-                checked = switch,
+                checked = switch.value,
                 modifier = Modifier.padding(end = 10.dp),
                 onCheckedChange = {
-                    switch = it
+                    switch.value = it
                     writeData(key, it)
+                    context.launch { itemClick(it) }
                 },
                 colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colors.primary)
             )
@@ -127,8 +128,8 @@ class Setting(private val context: MainActivity) {
         label: String? = null,
         itemClick: (Int) -> Unit = {}//标签
         //Modifier
-    ) {
-        val visibility = remember {
+        ) {
+            val visibility = remember {
             mutableStateOf(false)
         }
 
@@ -208,58 +209,6 @@ class Setting(private val context: MainActivity) {
         }
     }
     //通用Compose
-
-    @Composable
-    private fun BasicSetting(
-        icon: Painter?,
-        title: String,
-        label: String?,
-        itemClick: (() -> Unit) = {},
-        iconSpaceReserve: Boolean = true,
-        content: @Composable () -> Unit = {}
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .clickable {
-                    itemClick()
-                },
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(contentAlignment = Alignment.CenterStart) {
-                //图标
-                icon?.let {
-                    Icon(
-                        painter = it,
-                        contentDescription = title,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .padding(start = 10.dp),
-                        tint = MaterialTheme.colors.secondary
-                    )
-                }
-                //文字
-                Column(
-                    modifier = Modifier.padding(start = if (iconSpaceReserve) 55.dp else 12.dp),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = title,
-                        fontSize = 16.sp,
-                        color = Gray500,
-                        fontWeight = FontWeight.W500
-                    )
-                    label?.let {
-                        Text(text = it, fontSize = 13.sp, color = Gray300)
-                    }
-                }
-
-            }
-            content()
-        }
-    }
 
     private fun writeData(key: Preferences.Key<Boolean>, switch: Boolean) {
         context.launch {

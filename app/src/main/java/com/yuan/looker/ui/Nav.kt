@@ -2,13 +2,13 @@ package com.yuan.looker.ui
 
 sealed class Screen(val route:String){
     object MainScreen:Screen("mainScreen")
-    object SecondScreen:Screen("secondScreen")
+    object ReadScreen:Screen("readScreen")
     object TestScreen:Screen("testScreen")
     object SettingScreen:Screen("settingScreen")
 }
 
-sealed class Tab(val route:String){
-    object HomeTab:Tab("homeTab")
-    object UserTab:Tab("userTab")
-    object ShopTab:Tab("shopTab")
+sealed class Tabs(val route:String){
+    object HomeTab:Tabs("homeTab")
+    object UserTab:Tabs("userTab")
+    object ShopTab:Tabs("shopTab")
 }

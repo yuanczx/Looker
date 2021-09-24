@@ -1,22 +1,16 @@
 package com.yuan.looker.model
 
 data class Content(
-    val ads: List<Ad>,
     val alias: String,
     val boardid: String,
     val cid: String,
-    val commentStatus: Int,
     val daynum: String,
     val digest: String,
     val docid: String,
     val downTimes: Int,
     val ename: String,
     val extraShowFields: String,
-    val hasAD: Int,
     val hasCover: Boolean,
-    val hasHead: Int,
-    val hasIcon: Boolean,
-    val hasImg: Int,
     val imgsrc: String,
     val lmodify: String,
     val ltitle: String,

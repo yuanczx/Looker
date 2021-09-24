@@ -11,4 +11,5 @@ interface INewsApi {
 
     @GET("T1467284926140/{index}-10.html")
     fun getSelection(@Path("index")index:Int):Call<News>
+
 }
