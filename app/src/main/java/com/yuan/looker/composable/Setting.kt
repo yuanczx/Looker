@@ -37,35 +37,37 @@ class Setting(private val context: MainActivity) {
         itemClick: suspend (Boolean) -> Unit={}
     ) {
         //定义变量
-        val switch = remember { mutableStateOf(false) }
+        var switch by remember { mutableStateOf(false) }
         //获取DataStore数据
         context.launch {
-            switch.value = context.dataStore.data.first()[key]?:false
+            switch = context.dataStore.data.first()[key]?:false
         }
 
         //Compose界面
         BasicSetting(icon, title, label, itemClick = {
-            switch.value = !switch.value
-            context.launch {
+            context.launch {switch = !switch
                 context.dataStore.edit {
-                    it[key] = switch.value
-                    itemClick(switch.value)
+                    it[key] = switch
                 }
+
             }
         }) {
+
+
             Switch(
-                checked = switch.value,
+                checked = switch,
                 modifier = Modifier.padding(end = 10.dp),
                 onCheckedChange = {
-                    switch.value = it
+                    switch = it
                     writeData(key, it)
-                    context.launch { itemClick(it) }
                 },
                 colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colors.primary)
             )
         }
         //开关
-
+        LaunchedEffect(key1 = switch, block = {
+            context.launch { itemClick(switch) }
+        })
     }
 
     @SuppressLint("CoroutineCreationDuringComposition")

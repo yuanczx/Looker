@@ -282,21 +282,6 @@ class MainScreen(private val context: MainActivity) {
                     }
                     var isLoading by remember { mutableStateOf(false) }
                     viewModel.news?.let { newsList ->
-//                        LazyColumn{
-//                            items(newsList){item ->
-//                                Row(
-//                                    Modifier
-//                                        .fillMaxWidth()
-//                                        .height(120.dp)) {
-//                                    val painter = item.imgsrc.replace("http","https")
-//                                    Image(painter = rememberImagePainter(data = painter), contentDescription = "")
-//                                    Text(text = item.title,modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .height(120.dp))
-//                                }
-//
-//                            }
-//                        }
                         NewsList(
                             newscast = newsList,
                             lastEvent = if (viewModel.load) null else { isLast ->

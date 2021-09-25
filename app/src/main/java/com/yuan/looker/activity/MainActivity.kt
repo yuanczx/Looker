@@ -9,6 +9,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.getValue
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.navigation.NavHostController
@@ -50,7 +52,14 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
     //初始化设置
     init {
         launch {
+            val darkMode = dataStore.data.first()[booleanPreferencesKey("darkMode")]?: false
+
             val themeIndex = dataStore.data.first()[intPreferencesKey("theme")] ?: 0
+            viewModel.themeIndex = themeIndex
+            if (darkMode) {
+                viewModel.darkMode = true
+                return@launch
+            }
             viewModel.lookerTheme = when (themeIndex) {
                 0 -> BlueTheme
                 1 -> OrangeTheme
@@ -75,9 +84,21 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         }
 
         setContent {
+            if (viewModel.darkMode){
+                if (isSystemInDarkTheme()) { viewModel.lookerTheme = DarkColorPalette }
+            }else{
+                viewModel.lookerTheme =when (viewModel.themeIndex) {
+                    0 -> BlueTheme
+                    1 -> OrangeTheme
+                    2 -> GreenTheme
+                    3 -> PurpleTheme
+                    else -> DarkColorPalette
+                }
+            }
             //变量声明
             navController = rememberNavController()
 
+            //
             val mainScreen = MainScreen(this)
             val settingScreen = SettingScreen(this)
             val readScreen = ReadScreen(this)

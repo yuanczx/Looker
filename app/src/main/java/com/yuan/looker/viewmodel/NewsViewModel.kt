@@ -13,6 +13,8 @@ import java.net.UnknownHostException
 
 class NewsViewModel : ViewModel() {
 
+    var themeIndex = 0
+    var darkMode by mutableStateOf(false)
     var lookerTheme by mutableStateOf(BlueTheme)
     var news: List<Content>? by mutableStateOf(null)
     var newsIndex = 0

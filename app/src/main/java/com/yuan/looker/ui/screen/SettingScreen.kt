@@ -22,16 +22,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.yuan.looker.R
 import com.yuan.looker.activity.MainActivity
-import com.yuan.looker.activity.dataStore
 import com.yuan.looker.composable.Setting
 import com.yuan.looker.ui.theme.*
 import com.yuan.looker.viewmodel.NewsViewModel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
@@ -66,25 +63,14 @@ class SettingScreen(private val context: MainActivity) {
                 key = nightModeKey,
                 title = "深色模式",
                 icon = rememberVectorPainter(image = Icons.Outlined.Email),
-                label = "是否开启深色模式",
+                label = "是否开启深色模式跟随系统",
                 itemClick = {
-                    viewModel.lookerTheme = if (it) {
-                        DarkColorPalette
-                    } else {
-                        when (context.dataStore.data.first()[intPreferencesKey("theme")]
-                            ?: 0) {
-                            0 -> BlueTheme
-                            1 -> OrangeTheme
-                            2 -> GreenTheme
-                            3 -> PurpleTheme
-                            else -> BlueTheme
-                        }
-                    }
+                    viewModel.darkMode = it
                 }
             )
 
 
-            val themeSelector = listOf("蓝色", "橙色", "青色", "紫色")
+            val themeSelector = listOf("蓝色", "橙色", "青色", "紫色","深色")
             val themeKey = intPreferencesKey("theme")
 
 
@@ -96,16 +82,14 @@ class SettingScreen(private val context: MainActivity) {
                 data = themeSelector,
                 iconSpaceReserve = true,
                 itemClick = { index ->
+                    viewModel.themeIndex = index
                     context.launch {
                         viewModel.lookerTheme = when (index) {
                             0 -> BlueTheme
                             1 -> OrangeTheme
                             2 -> GreenTheme
                             3 -> PurpleTheme
-                            else -> BlueTheme
-                        }
-                        context.dataStore.edit {
-                            it[nightModeKey] = false
+                            else -> DarkColorPalette
                         }
                     }
                 }

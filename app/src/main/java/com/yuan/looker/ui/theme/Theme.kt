@@ -1,6 +1,5 @@
 package com.yuan.looker.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
@@ -51,11 +50,10 @@ val Colors.settingBg: Color @Composable get() = if (isLight) Gray100 else DarkSt
 @Composable
 fun LookerTheme(
     theme: Colors = BlueTheme,
-    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colors = if (darkTheme) DarkColorPalette else theme,
+        colors =  theme,
         typography = Typography,
         shapes = Shapes,
         content = content,
