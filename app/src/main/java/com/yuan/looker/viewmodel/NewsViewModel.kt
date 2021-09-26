@@ -32,6 +32,8 @@ class NewsViewModel : ViewModel() {
         3 -> PurpleTheme
         else -> DarkColorPalette
     }
+
+
     suspend fun loadNews(tab:Int) {
         try {
         val response = when(tab){

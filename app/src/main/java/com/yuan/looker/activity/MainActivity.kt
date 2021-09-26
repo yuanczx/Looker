@@ -31,7 +31,10 @@ import com.yuan.looker.ui.Screen
 import com.yuan.looker.ui.screen.MainScreen
 import com.yuan.looker.ui.screen.ReadScreen
 import com.yuan.looker.ui.screen.SettingScreen
-import com.yuan.looker.ui.theme.*
+import com.yuan.looker.ui.theme.Blue500
+import com.yuan.looker.ui.theme.DarkColorPalette
+import com.yuan.looker.ui.theme.LookerTheme
+import com.yuan.looker.ui.theme.statusBar
 import com.yuan.looker.viewmodel.NewsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -52,7 +55,8 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         launch {
             //深色模式跟随系统
             val darkMode = dataStore.data.first()[booleanPreferencesKey("darkMode")]?: false
-            viewModel.themeIndex = dataStore.data.first()[intPreferencesKey("theme")] ?: 0
+            val index = dataStore.data.first()[intPreferencesKey("theme")] ?: 0
+            viewModel.themeIndex = index
             if (darkMode) {
                 viewModel.darkMode = true
                 return@launch
@@ -75,8 +79,11 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         }
 
         setContent {
-            if (viewModel.darkMode && isSystemInDarkTheme()){
-               viewModel.lookerTheme = DarkColorPalette
+            if (viewModel.darkMode ){
+                if (isSystemInDarkTheme()) {
+                    viewModel.lookerTheme = DarkColorPalette
+                }
+
             }else{
                 viewModel.lookerTheme = viewModel.loadTheme()
             }

@@ -56,7 +56,7 @@ class MainScreen(private val context: MainActivity) {
     @Composable
     private fun MyTopBar(scaffoldState: ScaffoldState) {
         val scope = rememberCoroutineScope()
-        TopAppBar(elevation = 0.dp,modifier = Modifier.background(MaterialTheme.colors.statusBar)) {
+        TopAppBar(backgroundColor = MaterialTheme.colors.statusBar,elevation = 0.dp) {
             IconButton(onClick = {
                 scope.launch {
                     //开启（关闭）Drawer
@@ -195,7 +195,7 @@ class MainScreen(private val context: MainActivity) {
                 .fillMaxSize()
         ) {
             Scaffold(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background),
                 topBar = { MyTopBar(state) },
                 bottomBar = { MyBottomBar(tabNavController) },
                 drawerContent = { MyDrawer() },
