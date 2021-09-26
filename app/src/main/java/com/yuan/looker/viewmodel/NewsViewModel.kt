@@ -7,19 +7,31 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.yuan.looker.instance.MyRetrofit
 import com.yuan.looker.model.Content
-import com.yuan.looker.ui.theme.BlueTheme
+import com.yuan.looker.ui.theme.*
 import retrofit2.awaitResponse
 import java.net.UnknownHostException
 
 class NewsViewModel : ViewModel() {
-
+    //主题索引
     var themeIndex = 0
+    //深色模式
     var darkMode by mutableStateOf(false)
+    //主题
     var lookerTheme by mutableStateOf(BlueTheme)
+    //新闻列表
     var news: List<Content>? by mutableStateOf(null)
+    //新闻索引
     var newsIndex = 0
+    //是否正在加载
     var load = false
 
+    fun loadTheme(index:Int = themeIndex)=when(index){
+        0 -> BlueTheme
+        1 -> OrangeTheme
+        2 -> GreenTheme
+        3 -> PurpleTheme
+        else -> DarkColorPalette
+    }
     suspend fun loadNews(tab:Int) {
         try {
         val response = when(tab){

@@ -44,6 +44,7 @@ import com.yuan.looker.ui.Tabs
 import com.yuan.looker.ui.theme.Blue500
 import com.yuan.looker.ui.theme.Blue700
 import com.yuan.looker.ui.theme.Orange500
+import com.yuan.looker.ui.theme.statusBar
 import com.yuan.looker.viewmodel.NewsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -55,7 +56,7 @@ class MainScreen(private val context: MainActivity) {
     @Composable
     private fun MyTopBar(scaffoldState: ScaffoldState) {
         val scope = rememberCoroutineScope()
-        TopAppBar(elevation = 0.dp) {
+        TopAppBar(elevation = 0.dp,modifier = Modifier.background(MaterialTheme.colors.statusBar)) {
             IconButton(onClick = {
                 scope.launch {
                     //开启（关闭）Drawer
@@ -253,7 +254,7 @@ class MainScreen(private val context: MainActivity) {
                     mutableStateOf(0)
                 }
                 Column(Modifier.fillMaxSize()) {
-                    TabRow(selectedTabIndex = selectedTab) {
+                    TabRow(selectedTabIndex = selectedTab,backgroundColor = MaterialTheme.colors.statusBar) {
                         Tab(
                             selected = selectedTab == 0,
                             onClick = {

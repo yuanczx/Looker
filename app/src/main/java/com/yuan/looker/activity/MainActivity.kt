@@ -42,31 +42,22 @@ import kotlinx.coroutines.launch
 
 val MainActivity.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
 var MainActivity.splash: Boolean by mutableStateOf(false)
-//var MainActivity.lookerTheme by mutableStateOf(BlueTheme)
-
 
 class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
     lateinit var navController: NavHostController
-    private val viewModel by viewModels<NewsViewModel>()
+    private val viewModel:NewsViewModel by viewModels()
 
     //初始化设置
     init {
         launch {
+            //深色模式跟随系统
             val darkMode = dataStore.data.first()[booleanPreferencesKey("darkMode")]?: false
-
-            val themeIndex = dataStore.data.first()[intPreferencesKey("theme")] ?: 0
-            viewModel.themeIndex = themeIndex
+            viewModel.themeIndex = dataStore.data.first()[intPreferencesKey("theme")] ?: 0
             if (darkMode) {
                 viewModel.darkMode = true
                 return@launch
             }
-            viewModel.lookerTheme = when (themeIndex) {
-                0 -> BlueTheme
-                1 -> OrangeTheme
-                2 -> GreenTheme
-                3 -> PurpleTheme
-                else -> DarkColorPalette
-            }
+            viewModel.lookerTheme = viewModel.loadTheme()
         }
     }
 
@@ -84,16 +75,10 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         }
 
         setContent {
-            if (viewModel.darkMode){
-                if (isSystemInDarkTheme()) { viewModel.lookerTheme = DarkColorPalette }
+            if (viewModel.darkMode && isSystemInDarkTheme()){
+               viewModel.lookerTheme = DarkColorPalette
             }else{
-                viewModel.lookerTheme =when (viewModel.themeIndex) {
-                    0 -> BlueTheme
-                    1 -> OrangeTheme
-                    2 -> GreenTheme
-                    3 -> PurpleTheme
-                    else -> DarkColorPalette
-                }
+                viewModel.lookerTheme = viewModel.loadTheme()
             }
             //变量声明
             navController = rememberNavController()

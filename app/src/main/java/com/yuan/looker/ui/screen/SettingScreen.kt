@@ -6,17 +6,13 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
@@ -27,9 +23,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.yuan.looker.R
 import com.yuan.looker.activity.MainActivity
 import com.yuan.looker.composable.Setting
-import com.yuan.looker.ui.theme.*
 import com.yuan.looker.viewmodel.NewsViewModel
-import kotlinx.coroutines.launch
 
 
 class SettingScreen(private val context: MainActivity) {
@@ -44,7 +38,7 @@ class SettingScreen(private val context: MainActivity) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(if (viewModel.lookerTheme == DarkColorPalette) Color.Black else Color.White)
+                .background(MaterialTheme.colors.background)
         ) {
             TopAppBar {
                 IconButton(onClick = {
@@ -73,7 +67,6 @@ class SettingScreen(private val context: MainActivity) {
             val themeSelector = listOf("蓝色", "橙色", "青色", "紫色","深色")
             val themeKey = intPreferencesKey("theme")
 
-
             settingUtils.Selector(
                 key = themeKey,
                 title = "主题管理",
@@ -83,15 +76,7 @@ class SettingScreen(private val context: MainActivity) {
                 iconSpaceReserve = true,
                 itemClick = { index ->
                     viewModel.themeIndex = index
-                    context.launch {
-                        viewModel.lookerTheme = when (index) {
-                            0 -> BlueTheme
-                            1 -> OrangeTheme
-                            2 -> GreenTheme
-                            3 -> PurpleTheme
-                            else -> DarkColorPalette
-                        }
-                    }
+                    viewModel.lookerTheme =  viewModel.loadTheme()
                 }
             )
 
