@@ -56,7 +56,7 @@ class MainScreen(private val context: MainActivity) {
     @Composable
     private fun MyTopBar(scaffoldState: ScaffoldState) {
         val scope = rememberCoroutineScope()
-        TopAppBar(backgroundColor = MaterialTheme.colors.statusBar,elevation = 0.dp) {
+        TopAppBar(backgroundColor = MaterialTheme.colors.statusBar, elevation = 0.dp) {
             IconButton(onClick = {
                 scope.launch {
                     //开启（关闭）Drawer
@@ -83,6 +83,7 @@ class MainScreen(private val context: MainActivity) {
 
     @Composable
     private fun MyBottomBar(tabNavController: NavController) {
+
         var selectedTab by remember {
             mutableStateOf(1)
         }
@@ -93,13 +94,6 @@ class MainScreen(private val context: MainActivity) {
                     tabNavController.backQueue.removeLast()
                     tabNavController.navigate(Tabs.HomeTab.route) {
                         launchSingleTop = true
-                    }
-                    if (!viewModel.load) {
-                        context.launch {
-                            viewModel.load = true
-                            delay(1000)
-                            viewModel.load = false
-                        }
                     }
                 }
 
@@ -195,7 +189,9 @@ class MainScreen(private val context: MainActivity) {
                 .fillMaxSize()
         ) {
             Scaffold(
-                modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colors.background),
                 topBar = { MyTopBar(state) },
                 bottomBar = { MyBottomBar(tabNavController) },
                 drawerContent = { MyDrawer() },
@@ -219,6 +215,9 @@ class MainScreen(private val context: MainActivity) {
     @Composable
     fun HomeTab() {
         //初始化变量
+        var load by remember {
+            mutableStateOf(false)
+        }
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
         //Text(modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 60.dp),text = html)
         Column(
@@ -227,6 +226,7 @@ class MainScreen(private val context: MainActivity) {
                 .padding(bottom = 55.dp),
             horizontalAlignment = CenterHorizontally
         ) {
+            var selectedTab by remember { mutableStateOf(0) }
             SwipeRefresh(
                 state = swipeRefreshState,
                 indicator = { state, trigger ->
@@ -240,7 +240,9 @@ class MainScreen(private val context: MainActivity) {
                     swipeRefreshState.isRefreshing = true
                     context.launch {
                         viewModel.newsIndex = 0
-                        viewModel.loadNews(0)
+                        viewModel.load = true
+                        viewModel.loadNews(selectedTab)
+                        viewModel.load = false
                         swipeRefreshState.isRefreshing = false
                         Toast.makeText(
                             context,
@@ -250,17 +252,18 @@ class MainScreen(private val context: MainActivity) {
                     }
 
                 }) {
-                var selectedTab by remember {
-                    mutableStateOf(0)
-                }
                 Column(Modifier.fillMaxSize()) {
-                    TabRow(selectedTabIndex = selectedTab,backgroundColor = MaterialTheme.colors.statusBar) {
+                    TabRow(
+                        selectedTabIndex = selectedTab,
+                        backgroundColor = MaterialTheme.colors.statusBar
+                    ) {
                         Tab(
                             selected = selectedTab == 0,
                             onClick = {
                                 if (selectedTab != 0) {
                                     selectedTab = 0
                                     viewModel.newsIndex = 0
+                                    viewModel.load=false
                                     context.launch { viewModel.loadNews(0) }
                                 }
                             },
@@ -271,6 +274,7 @@ class MainScreen(private val context: MainActivity) {
                                 if (selectedTab != 1) {
                                     selectedTab = 1
                                     viewModel.newsIndex = 0
+                                    viewModel.load=false
                                     context.launch { viewModel.loadNews(1) }
 
                                 }
@@ -281,17 +285,17 @@ class MainScreen(private val context: MainActivity) {
                             onClick = { selectedTab = 2 },
                             text = { Text(text = "科技") })
                     }
-                    var isLoading by remember { mutableStateOf(false) }
                     viewModel.news?.let { newsList ->
                         NewsList(
                             newscast = newsList,
-                            lastEvent = if (viewModel.load) null else { isLast ->
+                            lastEvent = { isLast ->
                                 context.launch {
-                                    if (viewModel.newsIndex < 440) {
-                                        if (isLoading) return@launch
-                                        isLoading = true
+                                    if (!(viewModel.isNewsEnd() || viewModel.load)) {
+                                        if (viewModel.load || viewModel.isNewsEnd()) return@launch
+                                        viewModel.load = true
                                         if (isLast) viewModel.loadNews(selectedTab)
-                                        isLoading = false
+                                        delay(100)
+                                        viewModel.load = false
                                     }
                                 }
                             })
@@ -349,6 +353,10 @@ class MainScreen(private val context: MainActivity) {
                 context.splash = true
             }
         }
+    }
+
+    private fun tabClick(tab: Int) {
+
     }
 }
 

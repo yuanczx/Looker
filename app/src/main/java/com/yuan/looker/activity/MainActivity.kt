@@ -54,13 +54,8 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
     init {
         launch {
             //深色模式跟随系统
-            val darkMode = dataStore.data.first()[booleanPreferencesKey("darkMode")]?: false
-            val index = dataStore.data.first()[intPreferencesKey("theme")] ?: 0
-            viewModel.themeIndex = index
-            if (darkMode) {
-                viewModel.darkMode = true
-                return@launch
-            }
+            viewModel.darkMode= dataStore.data.first()[booleanPreferencesKey("darkMode")]?: false
+            viewModel.themeIndex= dataStore.data.first()[intPreferencesKey("theme")] ?: 0
             viewModel.lookerTheme = viewModel.loadTheme()
         }
     }
@@ -102,6 +97,7 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
                 enter = fadeIn(animationSpec = tween(durationMillis = 500)),
             ) {
                 LookerTheme(theme = viewModel.lookerTheme) {
+                    viewModel.load = false
                     //设置状态栏颜色
                     window.statusBarColor = MaterialTheme.colors.statusBar.toArgb()
                     NavHost(
