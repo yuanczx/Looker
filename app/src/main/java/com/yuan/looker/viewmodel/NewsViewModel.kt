@@ -30,6 +30,9 @@ class NewsViewModel : ViewModel() {
     //是否正在加载
     var load = false
 
+    //当前新闻
+    var currentUrl = ""
+
     fun loadTheme(index: Int = themeIndex) = when (index) {
         0 -> BlueTheme
         1 -> OrangeTheme

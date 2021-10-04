@@ -10,7 +10,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -19,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.yuan.looker.R
 import com.yuan.looker.activity.MainActivity
 import com.yuan.looker.composable.Setting
@@ -76,18 +74,20 @@ class SettingScreen(private val context: MainActivity) {
                 iconSpaceReserve = true,
                 itemClick = { index ->
                     viewModel.themeIndex = index
+                    if (viewModel.darkMode) return@Selector
                     viewModel.lookerTheme =  viewModel.loadTheme()
                 }
             )
 
+            //编辑框设置
 
-            val editorKey = stringPreferencesKey("editor")
-            settingUtils.Editor(
-                key = editorKey,
-                title = "Test it is success?",
-                label = "Hello world",
-                icon = rememberVectorPainter(image = Icons.Outlined.Search)
-            )
+//            val editorKey = stringPreferencesKey("editor")
+//            settingUtils.Editor(
+//                key = editorKey,
+//                title = "Test it is success?",
+//                label = "Hello world",
+//                icon = rememberVectorPainter(image = Icons.Outlined.Search)
+//            )
         }
     }
 }

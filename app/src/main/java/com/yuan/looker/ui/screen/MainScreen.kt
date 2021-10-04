@@ -4,12 +4,9 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -27,10 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
@@ -39,11 +32,8 @@ import com.yuan.looker.R
 import com.yuan.looker.activity.MainActivity
 import com.yuan.looker.activity.splash
 import com.yuan.looker.composable.NewsList
-import com.yuan.looker.ui.Screen
-import com.yuan.looker.ui.Tabs
+import com.yuan.looker.ui.navigation.Screen
 import com.yuan.looker.ui.theme.Blue500
-import com.yuan.looker.ui.theme.Blue700
-import com.yuan.looker.ui.theme.Orange500
 import com.yuan.looker.ui.theme.statusBar
 import com.yuan.looker.viewmodel.NewsViewModel
 import kotlinx.coroutines.delay
@@ -81,47 +71,6 @@ class MainScreen(private val context: MainActivity) {
         }
     }
 
-    @Composable
-    private fun MyBottomBar(tabNavController: NavController) {
-
-        var selectedTab by remember {
-            mutableStateOf(1)
-        }
-        BottomNavigation {
-            BottomNavigationItem(selected = selectedTab == 1, onClick = {
-                if (selectedTab != 1) {
-                    selectedTab = 1
-                    tabNavController.backQueue.removeLast()
-                    tabNavController.navigate(Tabs.HomeTab.route) {
-                        launchSingleTop = true
-                    }
-                }
-
-            }, icon = {
-                Icon(imageVector = Icons.Outlined.Home, contentDescription = "Home")
-            }, label = { Text(text = "Home") })
-            BottomNavigationItem(selected = selectedTab == 2, onClick = {
-                if (selectedTab != 2) {
-                    selectedTab = 2
-                    tabNavController.backQueue.removeLast()
-                    tabNavController.navigate(Tabs.ShopTab.route) {
-                        launchSingleTop = true
-                    }
-                }
-            }, icon = {
-                Icon(imageVector = Icons.Outlined.ShoppingCart, contentDescription = "Home")
-            }, label = { Text(text = "Shopping") })
-            BottomNavigationItem(selected = selectedTab == 3, onClick = {
-                if (selectedTab != 3) {
-                    selectedTab = 3
-                    tabNavController.backQueue.removeLast()
-                    tabNavController.navigate(Tabs.UserTab.route)
-                }
-            }, icon = {
-                Icon(imageVector = Icons.Outlined.AccountCircle, contentDescription = "Home")
-            }, label = { Text(text = "Account") })
-        }
-    }
 
     @Composable
     private fun MyDrawer() {
@@ -182,30 +131,20 @@ class MainScreen(private val context: MainActivity) {
     @ExperimentalFoundationApi
     @Composable
     fun Screen() {
-        val tabNavController = rememberNavController()
         val state = rememberScaffoldState()
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
             Scaffold(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colors.background),
                 topBar = { MyTopBar(state) },
-                bottomBar = { MyBottomBar(tabNavController) },
                 drawerContent = { MyDrawer() },
-                scaffoldState = state
-            ) {
-                NavHost(
-                    navController = tabNavController,
-                    startDestination = Tabs.HomeTab.route
-                ) {
-                    composable(Tabs.HomeTab.route) { HomeTab() }
-                    composable(Tabs.ShopTab.route) { ShopTab() }
-                    composable(Tabs.UserTab.route) { UserTab() }
-                }
-            }
+                scaffoldState = state,
+                content = { HomeTab() }
+            )
         }
     }
 
@@ -215,15 +154,10 @@ class MainScreen(private val context: MainActivity) {
     @Composable
     fun HomeTab() {
         //初始化变量
-        var load by remember {
-            mutableStateOf(false)
-        }
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
         //Text(modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 60.dp),text = html)
         Column(
-            Modifier
-                .fillMaxSize()
-                .padding(bottom = 55.dp),
+            Modifier.fillMaxSize(),
             horizontalAlignment = CenterHorizontally
         ) {
             var selectedTab by remember { mutableStateOf(0) }
@@ -263,7 +197,7 @@ class MainScreen(private val context: MainActivity) {
                                 if (selectedTab != 0) {
                                     selectedTab = 0
                                     viewModel.newsIndex = 0
-                                    viewModel.load=false
+                                    viewModel.load = false
                                     context.launch { viewModel.loadNews(0) }
                                 }
                             },
@@ -274,7 +208,7 @@ class MainScreen(private val context: MainActivity) {
                                 if (selectedTab != 1) {
                                     selectedTab = 1
                                     viewModel.newsIndex = 0
-                                    viewModel.load=false
+                                    viewModel.load = false
                                     context.launch { viewModel.loadNews(1) }
 
                                 }
@@ -300,37 +234,15 @@ class MainScreen(private val context: MainActivity) {
                                 }
                             })
                         {
+                            viewModel.currentUrl = it
                             context.navController.navigate(Screen.ReadScreen.route)
                         }
                     }
 
                 }
-
             }
         }
     }
-
-    @Composable
-    fun ShopTab() {
-        Column(modifier = Modifier.fillMaxSize()) {
-            val judge = remember { mutableStateOf(false) }
-            val color by animateColorAsState(
-                if (judge.value) Blue700 else Orange500, animationSpec = tween(
-                    durationMillis = 2000
-                )
-            )
-            Box(modifier = Modifier
-                .background(color)
-                .clickable { judge.value = !judge.value }
-                .size(120.dp)) {}
-        }
-    }
-
-    @Composable
-    fun UserTab() {
-        Text(text = "User Tab")
-    }
-
 
     @Composable
     fun Splash(splash: Boolean) {
@@ -353,10 +265,6 @@ class MainScreen(private val context: MainActivity) {
                 context.splash = true
             }
         }
-    }
-
-    private fun tabClick(tab: Int) {
-
     }
 }
 

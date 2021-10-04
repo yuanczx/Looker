@@ -27,7 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
-import com.yuan.looker.ui.Screen
+import com.yuan.looker.ui.navigation.Screen
 import com.yuan.looker.ui.screen.MainScreen
 import com.yuan.looker.ui.screen.ReadScreen
 import com.yuan.looker.ui.screen.SettingScreen
@@ -60,9 +60,10 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         }
     }
 
+
+    @ExperimentalAnimationApi
     @ExperimentalCoilApi
     @ExperimentalFoundationApi
-    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //WindowCompat.setDecorFitsSystemWindows(window, false) 取消状态栏占位
@@ -106,7 +107,7 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         composable(Screen.MainScreen.route) { mainScreen.Screen() }
-                        composable(Screen.ReadScreen.route){readScreen.Screen()}
+                        composable(Screen.ReadScreen.route){ readScreen.Screen()}
                         composable(Screen.SettingScreen.route) { settingScreen.Screen() }
                     }
                 }
