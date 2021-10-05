@@ -27,7 +27,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.annotation.ExperimentalCoilApi
-import com.yuan.looker.ui.navigation.Screen
 import com.yuan.looker.ui.screen.MainScreen
 import com.yuan.looker.ui.screen.ReadScreen
 import com.yuan.looker.ui.screen.SettingScreen
@@ -35,6 +34,7 @@ import com.yuan.looker.ui.theme.Blue500
 import com.yuan.looker.ui.theme.DarkColorPalette
 import com.yuan.looker.ui.theme.LookerTheme
 import com.yuan.looker.ui.theme.statusBar
+import com.yuan.looker.utils.sealed.Screen
 import com.yuan.looker.viewmodel.NewsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -60,21 +60,19 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
         }
     }
 
-
+    @ExperimentalFoundationApi
     @ExperimentalAnimationApi
     @ExperimentalCoilApi
-    @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //WindowCompat.setDecorFitsSystemWindows(window, false) 取消状态栏占位
         window.statusBarColor = Blue500.toArgb()
 
         //加载新闻
-        launch {
-            viewModel.loadNews(0)
-        }
+        launch { viewModel.loadNews(0) }
 
         setContent {
+            //深色模式设置
             if (viewModel.darkMode ){
                 if (isSystemInDarkTheme()) {
                     viewModel.lookerTheme = DarkColorPalette
@@ -85,8 +83,6 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
             }
             //变量声明
             navController = rememberNavController()
-
-            //
             val mainScreen = MainScreen(this)
             val settingScreen = SettingScreen(this)
             val readScreen = ReadScreen(this)

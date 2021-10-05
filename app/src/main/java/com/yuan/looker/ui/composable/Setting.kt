@@ -1,4 +1,4 @@
-package com.yuan.looker.composable
+package com.yuan.looker.ui.composable
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility

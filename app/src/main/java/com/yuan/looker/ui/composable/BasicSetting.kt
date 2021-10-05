@@ -1,4 +1,4 @@
-package com.yuan.looker.composable
+package com.yuan.looker.ui.composable
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

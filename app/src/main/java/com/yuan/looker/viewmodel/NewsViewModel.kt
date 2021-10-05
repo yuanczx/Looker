@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.yuan.looker.model.NetEaseNewsItem
 import com.yuan.looker.ui.theme.*
 import com.yuan.looker.utils.MyRetrofit
+import com.yuan.looker.utils.sealed.Sort
 import retrofit2.awaitResponse
 import java.net.UnknownHostException
 
@@ -22,7 +23,6 @@ class NewsViewModel : ViewModel() {
     var lookerTheme by mutableStateOf(BlueTheme)
 
     //新闻列表
-//    var news: List<Content>? by mutableStateOf(null)
     var news: List<NetEaseNewsItem>? by mutableStateOf(null)
 
     //新闻索引
@@ -44,19 +44,21 @@ class NewsViewModel : ViewModel() {
 
     fun isNewsEnd() = newsIndex >= 440
 
+
+    private fun getSort(index: Int)=when(index){
+        0->Sort.News
+        1->Sort.Financial
+        2->Sort.Tech
+        else -> Sort.News
+    }
+
     //加载新闻
     suspend fun loadNews(tab: Int) {
-        val sort  = when(tab){
-            0->"BBM54PGAwangning"
-            1->"BA8EE5GMwangning"
-            2->"BA8D4A3Rwangning"
-            else->""
-        }
+        val sort = getSort(tab)
         try {
-            val response = MyRetrofit.api.getNews(sort,newsIndex).awaitResponse()
+            val response = MyRetrofit.api.getNews(sort.name,newsIndex).awaitResponse()
             if (response.isSuccessful) {
                 val data = response.body()!!
-
                 //过滤：移除空元素
                 data.removeIf {
                     with(it){

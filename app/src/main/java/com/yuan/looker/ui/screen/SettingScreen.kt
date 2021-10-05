@@ -20,7 +20,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.yuan.looker.R
 import com.yuan.looker.activity.MainActivity
-import com.yuan.looker.composable.Setting
+import com.yuan.looker.ui.composable.Setting
 import com.yuan.looker.viewmodel.NewsViewModel
 
 
@@ -32,12 +32,9 @@ class SettingScreen(private val context: MainActivity) {
     @Composable
     fun Screen() {
         val settingUtils = Setting(context)
-
-        Column(
-            modifier = Modifier
+        Column(modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colors.background)
-        ) {
+                .background(MaterialTheme.colors.background)) {
             TopAppBar {
                 IconButton(onClick = {
                     context.navController.popBackStack()
@@ -49,7 +46,6 @@ class SettingScreen(private val context: MainActivity) {
                 }
                 Text(text = "设置", fontWeight = W600, fontSize = 20.sp)
             }
-
             val nightModeKey = booleanPreferencesKey("darkMode")
             settingUtils.Switcher(
                 key = nightModeKey,
@@ -78,9 +74,6 @@ class SettingScreen(private val context: MainActivity) {
                 data = themeSelector,
                 iconSpaceReserve = true
             )
-
-            //编辑框设置
-
 //            val editorKey = stringPreferencesKey("editor")
 //            settingUtils.Editor(
 //                key = editorKey,

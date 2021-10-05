@@ -31,8 +31,8 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.yuan.looker.R
 import com.yuan.looker.activity.MainActivity
 import com.yuan.looker.activity.splash
-import com.yuan.looker.composable.NewsList
-import com.yuan.looker.ui.navigation.Screen
+import com.yuan.looker.ui.composable.NewsList
+import com.yuan.looker.utils.sealed.Screen
 import com.yuan.looker.ui.theme.Blue500
 import com.yuan.looker.ui.theme.statusBar
 import com.yuan.looker.viewmodel.NewsViewModel
@@ -70,7 +70,6 @@ class MainScreen(private val context: MainActivity) {
 
         }
     }
-
 
     @Composable
     private fun MyDrawer() {
@@ -154,28 +153,41 @@ class MainScreen(private val context: MainActivity) {
     @Composable
     fun HomeTab() {
         //初始化变量
+        var selectedTab by remember { mutableStateOf(0) }
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
+        fun reloadNews(){
+            context.launch {
+                viewModel.newsIndex = 0
+                viewModel.load = true
+                viewModel.loadNews(selectedTab)
+                viewModel.load = false
+                swipeRefreshState.isRefreshing = false
+                Toast.makeText(
+                    context,
+                    context.resources.getString(R.string.refresh_success),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+        @Composable
+        fun LookerTab(label:String,self:Int){
+            Tab(
+                selected = selectedTab == self,
+                onClick = {
+                    if (selectedTab != self) {
+                        selectedTab = self
+                        viewModel.newsIndex = 0
+                        viewModel.load = false
+                        context.launch { viewModel.loadNews(self) }
+                    }
+                },
+                text = { Text(text = label) })
+        }
         //Text(modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 60.dp),text = html)
         Column(
             Modifier.fillMaxSize(),
             horizontalAlignment = CenterHorizontally
         ) {
-            var selectedTab by remember { mutableStateOf(0) }
-
-            @Composable
-            fun LookerTab(label:String,self:Int){
-                Tab(
-                    selected = selectedTab == self,
-                    onClick = {
-                        if (selectedTab != self) {
-                            selectedTab = self
-                            viewModel.newsIndex = 0
-                            viewModel.load = false
-                            context.launch { viewModel.loadNews(self) }
-                        }
-                    },
-                    text = { Text(text = label) })
-            }
 
             SwipeRefresh(
                 state = swipeRefreshState,
@@ -188,19 +200,7 @@ class MainScreen(private val context: MainActivity) {
                 },
                 onRefresh = {
                     swipeRefreshState.isRefreshing = true
-                    context.launch {
-                        viewModel.newsIndex = 0
-                        viewModel.load = true
-                        viewModel.loadNews(selectedTab)
-                        viewModel.load = false
-                        swipeRefreshState.isRefreshing = false
-                        Toast.makeText(
-                            context,
-                            context.resources.getString(R.string.refresh_success),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
+                    reloadNews()
                 }) {
                 Column(Modifier.fillMaxSize()) {
                     TabRow(
