@@ -52,8 +52,6 @@ class Setting(private val context: MainActivity) {
 
             }
         }) {
-
-
             Switch(
                 checked = switch,
                 modifier = Modifier.padding(end = 10.dp),
@@ -81,7 +79,7 @@ class Setting(private val context: MainActivity) {
         iconSpaceReserve: Boolean = true,
         itemClick: () -> Unit = {}
     ) {
-        var visiable by remember {
+        var visible by remember {
             mutableStateOf(false)
         }
         var text by remember {
@@ -97,11 +95,11 @@ class Setting(private val context: MainActivity) {
                 label = label,
                 iconSpaceReserve = iconSpaceReserve,
                 itemClick = {
-                    visiable = !visiable
+                    visible = !visible
                     itemClick()
                 }) {}
 
-            AnimatedVisibility(visible = visiable) {
+            AnimatedVisibility(visible = visible) {
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -231,9 +229,6 @@ class Setting(private val context: MainActivity) {
     private suspend fun readData(key: Preferences.Key<Int>) =
         context.dataStore.data.first()[key] ?: 0
 
-    @JvmName("readData1")
-    private suspend fun readData(key: Preferences.Key<Boolean>) =
-        context.dataStore.data.first()[key] ?: false
 
     @JvmName("readData2")
     private suspend fun readData(key: Preferences.Key<String>) =

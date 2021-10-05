@@ -161,6 +161,22 @@ class MainScreen(private val context: MainActivity) {
             horizontalAlignment = CenterHorizontally
         ) {
             var selectedTab by remember { mutableStateOf(0) }
+
+            @Composable
+            fun LookerTab(label:String,self:Int){
+                Tab(
+                    selected = selectedTab == self,
+                    onClick = {
+                        if (selectedTab != self) {
+                            selectedTab = self
+                            viewModel.newsIndex = 0
+                            viewModel.load = false
+                            context.launch { viewModel.loadNews(self) }
+                        }
+                    },
+                    text = { Text(text = label) })
+            }
+
             SwipeRefresh(
                 state = swipeRefreshState,
                 indicator = { state, trigger ->
@@ -191,33 +207,10 @@ class MainScreen(private val context: MainActivity) {
                         selectedTabIndex = selectedTab,
                         backgroundColor = MaterialTheme.colors.statusBar
                     ) {
-                        Tab(
-                            selected = selectedTab == 0,
-                            onClick = {
-                                if (selectedTab != 0) {
-                                    selectedTab = 0
-                                    viewModel.newsIndex = 0
-                                    viewModel.load = false
-                                    context.launch { viewModel.loadNews(0) }
-                                }
-                            },
-                            text = { Text(text = "头条") })
-                        Tab(
-                            selected = selectedTab == 1,
-                            onClick = {
-                                if (selectedTab != 1) {
-                                    selectedTab = 1
-                                    viewModel.newsIndex = 0
-                                    viewModel.load = false
-                                    context.launch { viewModel.loadNews(1) }
-
-                                }
-                            },
-                            text = { Text(text = "精选") })
-                        Tab(
-                            selected = selectedTab == 2,
-                            onClick = { selectedTab = 2 },
-                            text = { Text(text = "科技") })
+                        val labels = listOf("新闻","财经","科技")
+                        repeat(3){
+                            LookerTab(label = labels[it] , self = it)
+                        }
                     }
                     viewModel.news?.let { newsList ->
                         NewsList(

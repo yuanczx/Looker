@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.transform.RoundedCornersTransformation
-import com.yuan.looker.model.Content
+import com.yuan.looker.model.NetEaseNewsItem
 import com.yuan.looker.ui.theme.settingBg
 
 fun LazyListState.isScrolledToTheEnd() =
@@ -31,7 +31,8 @@ fun LazyListState.isScrolledToTheEnd() =
 @ExperimentalCoilApi
 @Composable
 fun NewsList(
-    newscast: List<Content>,
+    newscast: List<NetEaseNewsItem>,
+    //newscast: List<Content>,
     listState: LazyListState = rememberLazyListState(),
     lastEvent: ((Boolean) -> Unit)? = null,
     itemClick: (url: String) -> Unit
@@ -70,7 +71,8 @@ fun NewsList(
 
 @ExperimentalCoilApi
 @Composable
-fun NewsItem(newsItem: Content, itemClick: (url: String) -> Unit) {
+fun NewsItem(//newsItem: Content,
+             newsItem:NetEaseNewsItem,itemClick: (url: String) -> Unit) {
     Card(backgroundColor = MaterialTheme.colors.settingBg,
         modifier = Modifier
             .fillMaxWidth()

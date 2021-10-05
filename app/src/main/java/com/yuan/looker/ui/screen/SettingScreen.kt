@@ -67,16 +67,16 @@ class SettingScreen(private val context: MainActivity) {
 
             settingUtils.Selector(
                 key = themeKey,
-                title = "主题管理",
-                icon = painterResource(id = R.drawable.ic_theme),
-                label = "选择你喜欢的颜色",
-                data = themeSelector,
-                iconSpaceReserve = true,
                 itemClick = { index ->
                     viewModel.themeIndex = index
                     if (viewModel.darkMode) return@Selector
                     viewModel.lookerTheme =  viewModel.loadTheme()
-                }
+                },
+                title = "主题管理",
+                icon = painterResource(id = R.drawable.ic_theme),
+                label = "选择你喜欢的颜色",
+                data = themeSelector,
+                iconSpaceReserve = true
             )
 
             //编辑框设置

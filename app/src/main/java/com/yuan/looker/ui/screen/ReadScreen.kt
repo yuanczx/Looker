@@ -17,6 +17,8 @@ class ReadScreen(private val context: MainActivity) {
     @SuppressLint("SetJavaScriptEnabled")
     @Composable
     fun Screen() {
+
+
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = {
@@ -29,6 +31,8 @@ class ReadScreen(private val context: MainActivity) {
                 }
                 loadUrl(viewModel.currentUrl)
             }
-        })
+        },)
+
+
     }
 }

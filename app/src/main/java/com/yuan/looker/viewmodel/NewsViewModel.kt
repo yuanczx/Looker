@@ -5,9 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.yuan.looker.instance.MyRetrofit
-import com.yuan.looker.model.Content
+import com.yuan.looker.model.NetEaseNewsItem
 import com.yuan.looker.ui.theme.*
+import com.yuan.looker.utils.MyRetrofit
 import retrofit2.awaitResponse
 import java.net.UnknownHostException
 
@@ -22,7 +22,8 @@ class NewsViewModel : ViewModel() {
     var lookerTheme by mutableStateOf(BlueTheme)
 
     //新闻列表
-    var news: List<Content>? by mutableStateOf(null)
+//    var news: List<Content>? by mutableStateOf(null)
+    var news: List<NetEaseNewsItem>? by mutableStateOf(null)
 
     //新闻索引
     var newsIndex = 0
@@ -43,28 +44,25 @@ class NewsViewModel : ViewModel() {
 
     fun isNewsEnd() = newsIndex >= 440
 
-
+    //加载新闻
     suspend fun loadNews(tab: Int) {
+        val sort  = when(tab){
+            0->"BBM54PGAwangning"
+            1->"BA8EE5GMwangning"
+            2->"BA8D4A3Rwangning"
+            else->""
+        }
         try {
-            val response = when (tab) {
-                0 -> MyRetrofit.api.getHeadline(newsIndex).awaitResponse()
-                1 -> MyRetrofit.api.getSelection(newsIndex).awaitResponse()
-                else -> MyRetrofit.api.getHeadline(newsIndex).awaitResponse()
-            }
-            //MyRetrofit.api.getHeadline(newsIndex).awaitResponse()
+            val response = MyRetrofit.api.getNews(sort,newsIndex).awaitResponse()
             if (response.isSuccessful) {
-                val data = when (tab) {
-                    0 -> response.body()!!.Headline!!
-                    1 -> response.body()!!.Selection!!
-                    else -> response.body()!!.Headline!!
+                val data = response.body()!!
+
+                //过滤：移除空元素
+                data.removeIf {
+                    with(it){
+                        url.isBlank()||title.isBlank()||imgsrc.isBlank()
+                    }
                 }
-                data.removeIf { content ->
-                    content.title.isEmpty() ||
-                    content.imgsrc.isBlank() ||
-                    if (news == null) false else news!!.contains(content)||
-                    content.docid.isEmpty()
-                }
-                //response.body()!!.Headline!!
                 news = if (newsIndex == 0) data else news?.plus(data)
                 newsIndex += 10
                 Log.d("index", newsIndex.toString())
@@ -75,5 +73,4 @@ class NewsViewModel : ViewModel() {
             Log.d("error", e.toString())
         }
     }
-
 }
