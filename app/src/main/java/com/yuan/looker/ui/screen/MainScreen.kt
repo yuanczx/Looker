@@ -32,9 +32,9 @@ import com.yuan.looker.R
 import com.yuan.looker.activity.MainActivity
 import com.yuan.looker.activity.splash
 import com.yuan.looker.ui.composable.NewsList
-import com.yuan.looker.utils.sealed.Screen
 import com.yuan.looker.ui.theme.Blue500
 import com.yuan.looker.ui.theme.statusBar
+import com.yuan.looker.utils.sealed.Screen
 import com.yuan.looker.viewmodel.NewsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -226,9 +226,12 @@ class MainScreen(private val context: MainActivity) {
                                     }
                                 }
                             })
-                        {
-                            viewModel.currentUrl = it
+                        { docid->
+                            context.launch {
+                                viewModel.loadContent(docid)
+                            }
                             context.navController.navigate(Screen.ReadScreen.route)
+
                         }
                     }
 

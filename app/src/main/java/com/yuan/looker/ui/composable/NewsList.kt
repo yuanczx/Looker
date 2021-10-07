@@ -72,14 +72,13 @@ fun NewsList(
 @ExperimentalCoilApi
 @Composable
 fun NewsItem(//newsItem: Content,
-             newsItem:NetEaseNewsItem,itemClick: (url: String) -> Unit) {
+             newsItem:NetEaseNewsItem,itemClick: (String) -> Unit) {
     Card(backgroundColor = MaterialTheme.colors.settingBg,
         modifier = Modifier
             .fillMaxWidth()
             .width(120.dp)
             .padding(top =1.dp,bottom = 1.dp)
-            .clickable { itemClick(newsItem.url) },
-            //.padding(top = 7.dp,end = 10.dp),
+            .clickable { itemClick(newsItem.docid) },
         elevation = 1.dp,
         shape = RoundedCornerShape(0.dp),
 

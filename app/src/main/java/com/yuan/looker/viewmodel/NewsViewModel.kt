@@ -13,6 +13,21 @@ import retrofit2.awaitResponse
 import java.net.UnknownHostException
 
 class NewsViewModel : ViewModel() {
+    companion object {
+        private const val CSS = """<html><head><style>  
+            a{color:DodgerBlue;text-decoration:none}
+            .title{color:DimGray,;font-size:25px}
+            .time{color:gray;}
+            blockquote{border-left: 5px solid Gainsboro;background-color:GhostWhite;padding-left:10px}
+            p{text-indent:0;line-height:30px;letter-spacing:1.5px;font-size:20px;color:DimGray}
+            img{width:100%;margin-top:10px}
+            video{display: block;max-width:100%;margin-top:10px;margin-bottom:30px;width:100%}
+            .insurance p{text-indent:0px;font-size:15px;color:gray;line-height:18px}
+            .editor{text-indent:0px;font-size:13px;color:gray}
+            .bot_word{display: none;}
+            </style></head> <body>"""
+    }
+
     //主题索引
     var themeIndex = 0
 
@@ -32,7 +47,7 @@ class NewsViewModel : ViewModel() {
     var load = false
 
     //当前新闻
-    var currentUrl = ""
+    var currentNews by mutableStateOf("")
 
     fun loadTheme(index: Int = themeIndex) = when (index) {
         0 -> BlueTheme
@@ -45,10 +60,10 @@ class NewsViewModel : ViewModel() {
     fun isNewsEnd() = newsIndex >= 440
 
 
-    private fun getSort(index: Int)=when(index){
-        0->Sort.News
-        1->Sort.Financial
-        2->Sort.Tech
+    private fun getSort(index: Int) = when (index) {
+        0 -> Sort.News
+        1 -> Sort.Financial
+        2 -> Sort.Tech
         else -> Sort.News
     }
 
@@ -56,13 +71,13 @@ class NewsViewModel : ViewModel() {
     suspend fun loadNews(tab: Int) {
         val sort = getSort(tab)
         try {
-            val response = MyRetrofit.api.getNews(sort.name,newsIndex).awaitResponse()
+            val response = MyRetrofit.api.getNews(sort.name, newsIndex).awaitResponse()
             if (response.isSuccessful) {
                 val data = response.body()!!
                 //过滤：移除空元素
                 data.removeIf {
-                    with(it){
-                        url.isBlank()||title.isBlank()||imgsrc.isBlank()
+                    with(it) {
+                        docid.isBlank() || title.isBlank() || imgsrc.isBlank() || source.isBlank()
                     }
                 }
                 news = if (newsIndex == 0) data else news?.plus(data)
@@ -75,4 +90,26 @@ class NewsViewModel : ViewModel() {
             Log.d("error", e.toString())
         }
     }
+
+    suspend fun loadContent(id: String) {
+        try {
+            val response = MyRetrofit.api.getHtml(id).awaitResponse()
+            if (response.isSuccessful) {
+                currentNews = with(response.body()!!) {
+                     CSS+substring(
+                        indexOf("<div class=\"article-content\">"),
+                        indexOf("</article>"))
+                         .replace("//nimg","https://nimg")
+                         .replace("data-src=","src=")
+                         .replace("href=\"//","href=\"https://")
+                         .replace("http://","https://")
+                         .replace("<!--yinsurance=endAD_insurance-->","<div class=\"insurance\">")+ "</div></body></html>"
+                }
+                Log.d("html", currentNews)
+            }
+        } catch (e: Exception) {
+            Log.d("error", e.message!!)
+        }
+    }
+
 }
