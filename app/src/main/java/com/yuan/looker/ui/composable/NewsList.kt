@@ -23,7 +23,6 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.transform.RoundedCornersTransformation
 import com.yuan.looker.model.NetEaseNewsItem
-import com.yuan.looker.ui.theme.settingBg
 
 fun LazyListState.isScrolledToTheEnd() =
     layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
@@ -72,15 +71,15 @@ fun NewsList(
 @ExperimentalCoilApi
 @Composable
 fun NewsItem(//newsItem: Content,
-             newsItem:NetEaseNewsItem,itemClick: (url: String) -> Unit) {
-    Card(backgroundColor = MaterialTheme.colors.settingBg,
+             newsItem:NetEaseNewsItem,itemClick: (String) -> Unit) {
+    Box(Modifier.fillMaxWidth().width(160.dp)){
+    Card(backgroundColor = MaterialTheme.colors.background,
         modifier = Modifier
             .fillMaxWidth()
-            .width(120.dp)
-            .padding(top =1.dp,bottom = 1.dp)
-            .clickable { itemClick(newsItem.url) },
-            //.padding(top = 7.dp,end = 10.dp),
-        elevation = 1.dp,
+            .height(150.dp)
+            .padding(top =4.dp,bottom = 4.dp)
+            .clickable { itemClick(newsItem.docid) },
+        elevation = 3.dp,
         shape = RoundedCornerShape(0.dp),
 
     ) {
@@ -111,5 +110,6 @@ fun NewsItem(//newsItem: Content,
                     .padding(5.dp)
             )
         }
+    }
     }
 }

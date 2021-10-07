@@ -1,7 +1,7 @@
 package com.yuan.looker.utils
 
-import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.yuan.looker.model.NetEaseNews
 import okhttp3.ResponseBody
 import retrofit2.Converter
@@ -13,14 +13,27 @@ class LookerConverterFactory:Converter.Factory() {
         type: Type,
         annotations: Array<out Annotation>,
         retrofit: Retrofit
-    ): Converter<ResponseBody, *> = LookerConverter()
+    ): Converter<ResponseBody, *> ?{
+
+
+        if (TypeToken.get(type).equals(TypeToken.get(String::class.java))) { return HtmlConverter() }
+        if (TypeToken.get(type).equals(TypeToken.get(NetEaseNews::class.java))) { return LookerConverter() }
+
+        return null
+    }
 
     class LookerConverter:Converter<ResponseBody, NetEaseNews> {
         override fun convert(value: ResponseBody): NetEaseNews? {
             val json = value.string().drop(29).dropLast(2)
-            Log.d("Json",json)
             val gson = Gson()
             return gson.fromJson(json, NetEaseNews::class.java)
         }
+    }
+
+    class HtmlConverter:Converter<ResponseBody,String>{
+        override fun convert(value: ResponseBody): String? {
+            return  value.string()
+        }
+
     }
 }
