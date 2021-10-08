@@ -43,10 +43,11 @@ onSecondary = Color.Black,
 onBackground = Color.Black,
 onSurface = Color.Black,
 */
-val Colors.statusBar: Color @Composable get() = if (isLight) primary else DarkStatus
+val Colors.statusBar: Color @Composable get() = if (isLight) primary else Gray800
 
-val Colors.settingBg: Color @Composable get() = if (isLight) Gray100 else DarkStatus
+val Colors.settingBg: Color @Composable get() = if (isLight) Gray100 else Gray800
 
+val Colors.listBack:  Color @Composable get() = if (isLight) Gray200 else Gray800
 @Composable
 fun LookerTheme(
     theme: Colors = BlueTheme,

@@ -23,9 +23,11 @@ val Blue300 = Color(0xFF84BDFF)
 
 
 val Gray700 = Color(0xFF4B4949)
+val Gray800 = Color(0xFF1C1C1C)
 val Gray500 = Color(0xFF666666)
 val Gray300 = Color(0xFF797979)
 val Gray100 = Color(0xFFF8F8F8)
+val Gray200 = Color(0xFFF4F4F4)
 val DarkStatus = Color(0xFF282828)
 
 

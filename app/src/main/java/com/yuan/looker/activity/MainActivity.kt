@@ -114,7 +114,6 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
 
     override fun onDestroy() {
         super.onDestroy()
-        //取消MainScope
         cancel()
     }
 }

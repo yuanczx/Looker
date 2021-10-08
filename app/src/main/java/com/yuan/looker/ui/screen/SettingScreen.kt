@@ -9,10 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.unit.sp
@@ -21,6 +20,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import com.yuan.looker.R
 import com.yuan.looker.activity.MainActivity
 import com.yuan.looker.ui.composable.Setting
+import com.yuan.looker.ui.theme.statusBar
 import com.yuan.looker.viewmodel.NewsViewModel
 
 
@@ -33,24 +33,25 @@ class SettingScreen(private val context: MainActivity) {
     fun Screen() {
         val settingUtils = Setting(context)
         Column(modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background)) {
-            TopAppBar {
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background)) {
+            TopAppBar(backgroundColor = MaterialTheme.colors.statusBar) {
                 IconButton(onClick = {
                     context.navController.popBackStack()
                 }) {
                     Icon(
                         imageVector = Icons.Outlined.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = "Back",
+                        tint = Color.White
                     )
                 }
-                Text(text = "设置", fontWeight = W600, fontSize = 20.sp)
+                Text(text = "设置", fontWeight = W600, fontSize = 20.sp,color = Color.White)
             }
             val nightModeKey = booleanPreferencesKey("darkMode")
             settingUtils.Switcher(
                 key = nightModeKey,
                 title = "深色模式",
-                icon = rememberVectorPainter(image = Icons.Outlined.Email),
+                icon = painterResource(id = R.drawable.ic_invert_colors),
                 label = "是否开启深色模式跟随系统",
                 itemClick = {
                     viewModel.darkMode = it

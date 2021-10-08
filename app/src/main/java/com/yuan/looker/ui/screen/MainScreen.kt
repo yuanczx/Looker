@@ -8,6 +8,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -54,20 +55,18 @@ class MainScreen(private val context: MainActivity) {
                         scaffoldState.drawerState.close()
                     else scaffoldState.drawerState.open()
                 }
-            }) {
+            },content = {
                 Icon(
                     Icons.Default.Menu,
                     contentDescription = "Menu",
                     modifier = Modifier.padding(start = 10.dp, end = 10.dp)
                 )
-            }
-
+            })
             Text(
                 text = stringResource(id = R.string.app_name),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.W500
             )
-
         }
     }
 
@@ -131,10 +130,7 @@ class MainScreen(private val context: MainActivity) {
     @Composable
     fun Screen() {
         val state = rememberScaffoldState()
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             Scaffold(
                 modifier = Modifier
                     .fillMaxSize()
@@ -142,7 +138,7 @@ class MainScreen(private val context: MainActivity) {
                 topBar = { MyTopBar(state) },
                 drawerContent = { MyDrawer() },
                 scaffoldState = state,
-                content = { HomeTab() }
+                content = { Content() }
             )
         }
     }
@@ -151,15 +147,16 @@ class MainScreen(private val context: MainActivity) {
     @SuppressLint("CoroutineCreationDuringComposition")
     @ExperimentalFoundationApi
     @Composable
-    fun HomeTab() {
+    fun Content() {
         //初始化变量
-        var selectedTab by remember { mutableStateOf(0) }
+        val lazyListState = rememberLazyListState()
         val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
+
         fun reloadNews(){
             context.launch {
                 viewModel.newsIndex = 0
                 viewModel.load = true
-                viewModel.loadNews(selectedTab)
+                viewModel.loadNews(viewModel.selectedTab)
                 viewModel.load = false
                 swipeRefreshState.isRefreshing = false
                 Toast.makeText(
@@ -172,23 +169,21 @@ class MainScreen(private val context: MainActivity) {
         @Composable
         fun LookerTab(label:String,self:Int){
             Tab(
-                selected = selectedTab == self,
+                selected = (viewModel.selectedTab == self),
                 onClick = {
-                    if (selectedTab != self) {
-                        selectedTab = self
+                    if (viewModel.selectedTab != self) {
+                        viewModel.selectedTab = self
                         viewModel.newsIndex = 0
                         viewModel.load = false
-                        context.launch { viewModel.loadNews(self) }
+                        context.launch { viewModel.loadNews(self)
+                        lazyListState.scrollToItem(1)
+                        }
                     }
                 },
                 text = { Text(text = label) })
         }
-        //Text(modifier = Modifier.verticalScroll(rememberScrollState()).padding(bottom = 60.dp),text = html)
-        Column(
-            Modifier.fillMaxSize(),
-            horizontalAlignment = CenterHorizontally
-        ) {
 
+        Column(Modifier.fillMaxSize(),horizontalAlignment = CenterHorizontally ) {
             SwipeRefresh(
                 state = swipeRefreshState,
                 indicator = { state, trigger ->
@@ -202,39 +197,33 @@ class MainScreen(private val context: MainActivity) {
                     swipeRefreshState.isRefreshing = true
                     reloadNews()
                 }) {
-                Column(Modifier.fillMaxSize()) {
-                    TabRow(
-                        selectedTabIndex = selectedTab,
-                        backgroundColor = MaterialTheme.colors.statusBar
-                    ) {
+                    Column(Modifier.fillMaxSize()) {
+                    TabRow(selectedTabIndex = viewModel.selectedTab,backgroundColor = MaterialTheme.colors.statusBar) {
                         val labels = listOf("新闻","财经","科技")
-                        repeat(3){
-                            LookerTab(label = labels[it] , self = it)
-                        }
+                        repeat(3){ LookerTab(label = labels[it] , self = it) }
                     }
                     viewModel.news?.let { newsList ->
                         NewsList(
                             newscast = newsList,
+                            listState = lazyListState,
                             lastEvent = { isLast ->
                                 context.launch {
                                     if (!(viewModel.isNewsEnd() || viewModel.load)) {
                                         if (viewModel.load || viewModel.isNewsEnd()) return@launch
                                         viewModel.load = true
-                                        if (isLast) viewModel.loadNews(selectedTab)
+                                        if (isLast) viewModel.loadNews(viewModel.selectedTab)
                                         delay(100)
                                         viewModel.load = false
                                     }
                                 }
-                            })
-                        { docid->
-                            context.launch {
-                                viewModel.newsID=docid
+                            },
+                            itemClick ={   newsID->
+                                context.launch {
+                                viewModel.newsID=newsID
                                 viewModel.loadContent()
                             }
-                            context.navController.navigate(Screen.ReadScreen.route)
-                        }
-                    }
-
+                                context.navController.navigate(Screen.ReadScreen.route)} )
+                    }//列表
                 }
             }
         }

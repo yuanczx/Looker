@@ -53,6 +53,8 @@ class NewsViewModel : ViewModel() {
     //当前新闻
     var currentNews by mutableStateOf("")
 
+    var selectedTab by mutableStateOf(0)
+
     fun loadTheme(index: Int = themeIndex) = when (index) {
         0 -> BlueTheme
         1 -> OrangeTheme

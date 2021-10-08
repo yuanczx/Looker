@@ -15,6 +15,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight.Companion.W300
 import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -23,15 +24,14 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.transform.RoundedCornersTransformation
 import com.yuan.looker.model.NetEaseNewsItem
+import com.yuan.looker.ui.theme.listBack
 
-fun LazyListState.isScrolledToTheEnd() =
-    layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+fun LazyListState.isScrolledToTheEnd() =layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
 
 @ExperimentalCoilApi
 @Composable
 fun NewsList(
     newscast: List<NetEaseNewsItem>,
-    //newscast: List<Content>,
     listState: LazyListState = rememberLazyListState(),
     lastEvent: ((Boolean) -> Unit)? = null,
     itemClick: (url: String) -> Unit
@@ -40,66 +40,65 @@ fun NewsList(
         state = listState,
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colors.listBack)
     ) {
         items(newscast) { item ->
             NewsItem(newsItem = item, itemClick)
         }
         item {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .height(30.dp), horizontalArrangement = Arrangement.Center
-            ) {
+            Row( Modifier.fillMaxWidth().height(30.dp), horizontalArrangement = Arrangement.Center) {
                 CircularProgressIndicator(modifier = Modifier.size(25.dp), strokeWidth = 3.dp)
-                Text(
-                    text = "Loading",
-                    Modifier
-                        .padding(start = 10.dp)
-                        .fillMaxHeight(), textAlign = TextAlign.Center, fontWeight = W700
-                )
-            }
-
+                Text(text = "Loading", modifier = Modifier.padding(start = 10.dp).fillMaxHeight(), textAlign = TextAlign.Center, fontWeight = W700 ) }
         }
 
     }
-    lastEvent?.let {
-        it(listState.isScrolledToTheEnd())
-    }
+    lastEvent?.let {it(listState.isScrolledToTheEnd())}
 }
 
 @ExperimentalCoilApi
 @Composable
-fun NewsItem(//newsItem: Content,
-             newsItem:NetEaseNewsItem,itemClick: (String) -> Unit) {
-    Box(Modifier.fillMaxWidth().width(160.dp)){
+fun NewsItem(newsItem:NetEaseNewsItem,itemClick: (String) -> Unit) {
+    Box(Modifier.fillMaxWidth().width(150.dp)){
     Card(backgroundColor = MaterialTheme.colors.background,
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp)
-            .padding(top =4.dp,bottom = 4.dp)
+            .height(140.dp)
+            .padding(top = 4.dp, bottom = 4.dp)
             .clickable { itemClick(newsItem.docid) },
-        elevation = 3.dp,
+        elevation = 0.dp,
         shape = RoundedCornerShape(0.dp),
-
     ) {
-        Row(
-            modifier = Modifier
+        Row( modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp)
-        ) {
+                .fillMaxHeight()) {
             val imageSrc = newsItem.imgsrc.replace("http", "https")
+            Column(
+                Modifier
+                    .fillMaxWidth(0.6f)
+                    .fillMaxHeight()
+                    .padding(start = 5.dp, end = 5.dp,top = 5.dp,bottom = 6.dp),verticalArrangement = Arrangement.SpaceBetween) {
             Text(
                 text = newsItem.title,
                 fontWeight = W700,
                 fontSize = 18.sp,
                 color = MaterialTheme.colors.onSurface,
                 maxLines = 3,
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .padding(start = 5.dp, end = 5.dp)
-
             )
+            Row(Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(
+                text = newsItem.source,
+                fontWeight = W300,
+                fontSize = 13.sp,
+                color = MaterialTheme.colors.onSurface,
+                maxLines = 1,
+            )
+            Text(
+                text = newsItem.ptime,
+                fontWeight = W300,
+                fontSize = 13.sp,
+                color = MaterialTheme.colors.onSurface,
+                maxLines = 1,
+            )}}
             Image(
                 painter = rememberImagePainter(data = imageSrc,
                     builder = { transformations(RoundedCornersTransformation(20f)) }),

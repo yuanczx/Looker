@@ -43,7 +43,7 @@ fun BasicSetting(
                     modifier = Modifier
                         .size(40.dp)
                         .padding(start = 10.dp),
-                    tint = MaterialTheme.colors.secondary
+                    tint = MaterialTheme.colors.primary
                 )
             }
             //文字
