@@ -98,7 +98,6 @@ class Setting(private val context: MainActivity) {
                     visible = !visible
                     itemClick()
                 }) {}
-
             AnimatedVisibility(visible = visible) {
                 OutlinedTextField(
                     modifier = Modifier
@@ -122,10 +121,10 @@ class Setting(private val context: MainActivity) {
     fun Selector(
         key: Preferences.Key<Int>,//DataStore key
         title: String,//标题
-        data: List<String>,
+        data: List<String>,//数据
         icon: Painter? = null,//图标
         iconSpaceReserve: Boolean = true,
-        label: String? = null,
+        label: String? = null,//标签
         itemClick: (Int) -> Unit = {}//标签
         //Modifier
         ) {
@@ -209,15 +208,13 @@ class Setting(private val context: MainActivity) {
         }
     }
     //通用Compose
-
-    private fun writeData(key: Preferences.Key<Boolean>, switch: Boolean) {
+     fun writeData(key: Preferences.Key<Boolean>, switch: Boolean) {
         context.launch {
             context.dataStore.edit {
                 it[key] = switch
             }
         }
     }
-
     private fun writeData(key: Preferences.Key<String>, text: String) {
         context.launch {
             context.dataStore.edit {
@@ -225,12 +222,9 @@ class Setting(private val context: MainActivity) {
             }
         }
     }
-
     private suspend fun readData(key: Preferences.Key<Int>) =
         context.dataStore.data.first()[key] ?: 0
-
-
     @JvmName("readData2")
     private suspend fun readData(key: Preferences.Key<String>) =
         context.dataStore.data.first()[key] ?: ""
-}
+    }

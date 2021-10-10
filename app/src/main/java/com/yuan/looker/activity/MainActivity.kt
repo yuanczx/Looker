@@ -30,7 +30,6 @@ import coil.annotation.ExperimentalCoilApi
 import com.yuan.looker.ui.screen.MainScreen
 import com.yuan.looker.ui.screen.ReadScreen
 import com.yuan.looker.ui.screen.SettingScreen
-import com.yuan.looker.ui.theme.Blue500
 import com.yuan.looker.ui.theme.DarkColorPalette
 import com.yuan.looker.ui.theme.LookerTheme
 import com.yuan.looker.ui.theme.statusBar
@@ -66,18 +65,15 @@ class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //WindowCompat.setDecorFitsSystemWindows(window, false) 取消状态栏占位
-        window.statusBarColor = Blue500.toArgb()
 
         //加载新闻
         launch { viewModel.loadNews(0) }
-
         setContent {
             //深色模式设置
             if (viewModel.darkMode ){
                 if (isSystemInDarkTheme()) {
                     viewModel.lookerTheme = DarkColorPalette
                 }
-
             }else{
                 viewModel.lookerTheme = viewModel.loadTheme()
             }

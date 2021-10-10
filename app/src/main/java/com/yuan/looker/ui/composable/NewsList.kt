@@ -31,7 +31,7 @@ fun LazyListState.isScrolledToTheEnd() =layoutInfo.visibleItemsInfo.lastOrNull()
 @ExperimentalCoilApi
 @Composable
 fun NewsList(
-    newscast: List<NetEaseNewsItem>,
+    newsList: List<NetEaseNewsItem>,
     listState: LazyListState = rememberLazyListState(),
     lastEvent: ((Boolean) -> Unit)? = null,
     itemClick: (url: String) -> Unit
@@ -42,7 +42,7 @@ fun NewsList(
             .fillMaxSize()
             .background(MaterialTheme.colors.listBack)
     ) {
-        items(newscast) { item ->
+        items(newsList) { item ->
             NewsItem(newsItem = item, itemClick)
         }
         item {

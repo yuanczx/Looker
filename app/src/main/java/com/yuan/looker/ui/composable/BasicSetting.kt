@@ -17,21 +17,21 @@ import com.yuan.looker.ui.theme.Gray500
 
 @Composable
 fun BasicSetting(
-    icon: Painter?,
-    title: String,
-    label: String?,
-    itemClick: (() -> Unit) = {},
-    iconSpaceReserve: Boolean = true,
-    content: @Composable () -> Unit = {}
+    icon: Painter?,//图标
+    title: String,//标题
+    label: String?,//标签
+    itemClick: (() -> Unit) = {},//点击事件
+    iconSpaceReserve: Boolean = true,//保留图标占位
+    content: @Composable () -> Unit = {}//内容
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .clickable {
-                itemClick()
-            },
-        horizontalArrangement = Arrangement.SpaceBetween,
+       modifier = Modifier
+           .fillMaxWidth()
+           .height(60.dp)
+          .clickable {
+              itemClick()
+          },
+       horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(contentAlignment = Alignment.CenterStart) {

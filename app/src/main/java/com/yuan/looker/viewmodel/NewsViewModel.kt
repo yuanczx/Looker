@@ -13,8 +13,8 @@ import retrofit2.awaitResponse
 import java.net.UnknownHostException
 
 class NewsViewModel : ViewModel() {
-    companion object{
-        private fun getCss(dark:Boolean)= """<html><head><style>  
+    companion object {
+        private fun getCss(dark: Boolean) = """<html><head><style>  
          body{background-color:${if (dark) "Black" else "White"}}
          a{color:DodgerBlue;text-decoration:none}
          .title{color:${if (dark) "WhiteSmoke" else "Black"};font-size:25px}
@@ -42,7 +42,7 @@ class NewsViewModel : ViewModel() {
     var lookerTheme by mutableStateOf(BlueTheme)
 
     //新闻列表
-    var news: List<NetEaseNewsItem>? by mutableStateOf(null)
+    var news: List<NetEaseNewsItem> by mutableStateOf(listOf())
 
     //新闻索引
     var newsIndex = 0
@@ -70,6 +70,7 @@ class NewsViewModel : ViewModel() {
         0 -> Sort.News
         1 -> Sort.Financial
         2 -> Sort.Tech
+        3 -> Sort.Army
         else -> Sort.News
     }
 
@@ -86,7 +87,8 @@ class NewsViewModel : ViewModel() {
                         docid.isBlank() || title.isBlank() || imgsrc.isBlank() || source.isBlank()
                     }
                 }
-                news = if (newsIndex == 0) data else news?.plus(data)
+                if (newsIndex==0) news = listOf()
+                news = news.plus(data)
                 newsIndex += 10
                 Log.d("index", newsIndex.toString())
             }
@@ -99,19 +101,23 @@ class NewsViewModel : ViewModel() {
 
 
     suspend fun loadContent() {
-        val dark = lookerTheme== DarkColorPalette
+        val dark = lookerTheme == DarkColorPalette
         try {
             val response = MyRetrofit.api.getHtml(newsID).awaitResponse()
             if (response.isSuccessful) {
                 currentNews = with(response.body()!!) {
-                     getCss(dark)+substring(
+                    getCss(dark) + substring(
                         indexOf("<div class=\"article-content\">"),
-                        indexOf("</article>"))
-                         .replace("//nimg","https://nimg")
-                         .replace("data-src=","src=")
-                         .replace("href=\"//","href=\"https://")
-                         .replace("http://","https://")
-                         .replace("<!--yinsurance=endAD_insurance-->","<div class=\"insurance\">")+ "</div></body></html>"
+                        indexOf("</article>")
+                    )
+                        .replace("//nimg", "https://nimg")
+                        .replace("data-src=", "src=")
+                        .replace("href=\"//", "href=\"https://")
+                        .replace("http://", "https://")
+                        .replace(
+                            "<!--yinsurance=endAD_insurance-->",
+                            "<div class=\"insurance\">"
+                        ) + "</div></body></html>"
                 }
                 Log.d("html", currentNews)
             }

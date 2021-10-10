@@ -18,7 +18,6 @@ class LookerConverterFactory:Converter.Factory() {
 
         if (TypeToken.get(type).equals(TypeToken.get(String::class.java))) { return HtmlConverter() }
         if (TypeToken.get(type).equals(TypeToken.get(NetEaseNews::class.java))) { return LookerConverter() }
-
         return null
     }
 
