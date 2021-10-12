@@ -1,10 +1,13 @@
 package com.yuan.looker.viewmodel
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.yuan.looker.R
 import com.yuan.looker.model.NetEaseNewsItem
 import com.yuan.looker.ui.theme.*
 import com.yuan.looker.utils.MyRetrofit
@@ -12,7 +15,7 @@ import com.yuan.looker.utils.sealed.Sort
 import retrofit2.awaitResponse
 import java.net.UnknownHostException
 
-class NewsViewModel : ViewModel() {
+class NewsViewModel(private val context: Context) : ViewModel() {
     companion object {
         private fun getCss(dark: Boolean) = """<html><head><style>  
          body{background-color:${if (dark) "Black" else "White"}}
@@ -50,6 +53,8 @@ class NewsViewModel : ViewModel() {
     //是否正在加载
     var load = false
 
+    var loadStatus by mutableStateOf(true)
+
     //当前新闻
     var currentNews by mutableStateOf("")
 
@@ -71,6 +76,7 @@ class NewsViewModel : ViewModel() {
         1 -> Sort.Financial
         2 -> Sort.Tech
         3 -> Sort.Army
+        4 -> Sort.Digital
         else -> Sort.News
     }
 
@@ -87,19 +93,24 @@ class NewsViewModel : ViewModel() {
                         docid.isBlank() || title.isBlank() || imgsrc.isBlank() || source.isBlank()
                     }
                 }
-                if (newsIndex==0) news = listOf()
+                if (newsIndex == 0) news = listOf()
                 news = news.plus(data)
                 newsIndex += 10
                 Log.d("index", newsIndex.toString())
+                loadStatus = true
             }
         } catch (e: UnknownHostException) {
-            Log.d("error", "网络错误")
+            message(context.getString(R.string.internet_error))
+            loadStatus = false
         } catch (e: Exception) {
-            Log.d("error", e.toString())
+            message(stringRes(R.string.refresh_fail))
+            loadStatus = false
         }
     }
 
 
+    fun stringRes(id:Int)=context.getString(id)
+    fun message(msg:String)=Toast.makeText(context,msg,Toast.LENGTH_SHORT).show()
     suspend fun loadContent() {
         val dark = lookerTheme == DarkColorPalette
         try {

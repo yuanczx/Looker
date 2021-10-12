@@ -1,7 +1,6 @@
 package com.yuan.looker.ui.screen
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -160,11 +159,6 @@ class MainScreen(private val context: MainActivity) {
                 viewModel.loadNews(viewModel.selectedTab)
                 viewModel.load = false
                 swipeRefreshState.isRefreshing = false
-                Toast.makeText(
-                    context,
-                    context.resources.getString(R.string.refresh_success),
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         }
 
@@ -206,8 +200,8 @@ class MainScreen(private val context: MainActivity) {
                         selectedTabIndex = viewModel.selectedTab,
                         backgroundColor = MaterialTheme.colors.statusBar
                     ) {
-                        val labels = listOf("新闻", "财经", "科技","军事")
-                        repeat(4) { LookerTab(label = labels[it], self = it) }
+                        val labels = listOf("新闻", "财经", "科技", "军事", "数码")
+                        repeat(5) { LookerTab(label = labels[it], self = it) }
                     }
                     NewsList(
                         newsList = viewModel.news,
@@ -220,7 +214,6 @@ class MainScreen(private val context: MainActivity) {
                                     if (isLast) viewModel.loadNews(viewModel.selectedTab)
                                     delay(100)
                                     viewModel.load = false
-                                    cancel()
                                 }
                             }
                         },

@@ -35,6 +35,7 @@ import com.yuan.looker.ui.theme.LookerTheme
 import com.yuan.looker.ui.theme.statusBar
 import com.yuan.looker.utils.sealed.Screen
 import com.yuan.looker.viewmodel.NewsViewModel
+import com.yuan.looker.viewmodel.NewsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -47,7 +48,7 @@ var MainActivity.splash: Boolean by mutableStateOf(false)
 
 class MainActivity : ComponentActivity(), CoroutineScope by MainScope() {
     lateinit var navController: NavHostController
-    private val viewModel:NewsViewModel by viewModels()
+    private val viewModel:NewsViewModel by viewModels{NewsViewModelFactory(this)}
 
     //初始化设置
     init {
