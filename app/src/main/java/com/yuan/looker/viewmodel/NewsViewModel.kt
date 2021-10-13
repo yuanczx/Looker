@@ -1,12 +1,12 @@
 package com.yuan.looker.viewmodel
 
-import android.content.Context
+import android.app.Application
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import com.yuan.looker.R
 import com.yuan.looker.model.NetEaseNewsItem
 import com.yuan.looker.ui.theme.*
@@ -15,7 +15,7 @@ import com.yuan.looker.utils.sealed.Sort
 import retrofit2.awaitResponse
 import java.net.UnknownHostException
 
-class NewsViewModel(private val context: Context) : ViewModel() {
+class NewsViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
         private fun getCss(dark: Boolean) = """<html><head><style>  
          body{background-color:${if (dark) "Black" else "White"}}
@@ -33,6 +33,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
 
     }
 
+    private fun context() = getApplication<Application>().applicationContext
     var newsID by mutableStateOf("")
 
     //主题索引
@@ -52,8 +53,6 @@ class NewsViewModel(private val context: Context) : ViewModel() {
 
     //是否正在加载
     var load = false
-
-    var loadStatus by mutableStateOf(true)
 
     //当前新闻
     var currentNews by mutableStateOf("")
@@ -80,6 +79,12 @@ class NewsViewModel(private val context: Context) : ViewModel() {
         else -> Sort.News
     }
 
+
+    fun arrayRes(id:Int) = context().resources.getStringArray(id)
+    fun stringRes(id: Int) = context().getString(id)
+    fun message(msg: String) = Toast.makeText(context(), msg, Toast.LENGTH_SHORT).show()
+    fun message(msgId: Int) = message(stringRes(msgId))
+
     //加载新闻
     suspend fun loadNews(tab: Int) {
         val sort = getSort(tab)
@@ -95,22 +100,21 @@ class NewsViewModel(private val context: Context) : ViewModel() {
                 }
                 if (newsIndex == 0) news = listOf()
                 news = news.plus(data)
+                if (newsIndex == 0) {
+                    message(R.string.refresh_success)
+                }
                 newsIndex += 10
                 Log.d("index", newsIndex.toString())
-                loadStatus = true
+
             }
         } catch (e: UnknownHostException) {
-            message(context.getString(R.string.internet_error))
-            loadStatus = false
+            message(R.string.refresh_fail)
         } catch (e: Exception) {
-            message(stringRes(R.string.refresh_fail))
-            loadStatus = false
+            message(R.string.refresh_fail)
         }
     }
 
 
-    fun stringRes(id:Int)=context.getString(id)
-    fun message(msg:String)=Toast.makeText(context,msg,Toast.LENGTH_SHORT).show()
     suspend fun loadContent() {
         val dark = lookerTheme == DarkColorPalette
         try {

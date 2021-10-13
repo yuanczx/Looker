@@ -121,7 +121,7 @@ class Setting(private val context: MainActivity) {
     fun Selector(
         key: Preferences.Key<Int>,//DataStore key
         title: String,//标题
-        data: List<String>,//数据
+        data: Array<String>,//数据
         icon: Painter? = null,//图标
         iconSpaceReserve: Boolean = true,
         label: String? = null,//标签

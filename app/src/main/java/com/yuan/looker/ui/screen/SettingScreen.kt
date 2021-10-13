@@ -59,7 +59,7 @@ class SettingScreen(private val context: MainActivity) {
             )
 
 
-            val themeSelector = listOf("蓝色", "橙色", "青色", "紫色","深色")
+            val themeSelector = viewModel.arrayRes(R.array.theme)
             val themeKey = intPreferencesKey("theme")
 
             settingUtils.Selector(

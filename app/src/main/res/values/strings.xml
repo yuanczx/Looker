@@ -3,4 +3,18 @@
     <string name="refresh_success">刷新成功</string>
     <string name="internet_error">无网络连接</string>
     <string name="refresh_fail">加载失败</string>
+    <string-array name="sorts">
+        <item>新闻</item>
+        <item>财经</item>
+        <item>科技</item>
+        <item>军事</item>
+        <item>数码</item>
+    </string-array>
+    <string-array name="theme">
+        <item>蓝色</item>
+        <item>橙色</item>
+        <item>青色</item>
+        <item>紫色</item>
+        <item>深色</item>
+    </string-array>
 </resources>

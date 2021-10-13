@@ -200,7 +200,7 @@ class MainScreen(private val context: MainActivity) {
                         selectedTabIndex = viewModel.selectedTab,
                         backgroundColor = MaterialTheme.colors.statusBar
                     ) {
-                        val labels = listOf("新闻", "财经", "科技", "军事", "数码")
+                        val labels = viewModel.arrayRes(R.array.sorts)
                         repeat(5) { LookerTab(label = labels[it], self = it) }
                     }
                     NewsList(
@@ -252,4 +252,5 @@ class MainScreen(private val context: MainActivity) {
         }
     }
 }
+
 
