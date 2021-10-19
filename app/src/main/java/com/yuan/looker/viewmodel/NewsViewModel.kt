@@ -52,12 +52,14 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
     var newsIndex = 0
 
     //是否正在加载
-    var load = false
+    var load by mutableStateOf(false)
 
     //当前新闻
     var currentNews by mutableStateOf("")
 
     var selectedTab by mutableStateOf(0)
+
+    var contentLoad by mutableStateOf(false)
 
     fun loadTheme(index: Int = themeIndex) = when (index) {
         0 -> BlueTheme
@@ -80,13 +82,14 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun arrayRes(id:Int) = context().resources.getStringArray(id)
+    fun arrayRes(id: Int): Array<String> = context().resources.getStringArray(id)
     fun stringRes(id: Int) = context().getString(id)
     fun message(msg: String) = Toast.makeText(context(), msg, Toast.LENGTH_SHORT).show()
     fun message(msgId: Int) = message(stringRes(msgId))
 
     //加载新闻
     suspend fun loadNews(tab: Int) {
+        if (load) return else load = true
         val sort = getSort(tab)
         try {
             val response = MyRetrofit.api.getNews(sort.name, newsIndex).awaitResponse()
@@ -106,16 +109,20 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
                 newsIndex += 10
                 Log.d("index", newsIndex.toString())
 
+                load = false
             }
         } catch (e: UnknownHostException) {
             message(R.string.refresh_fail)
+            load = false
         } catch (e: Exception) {
             message(R.string.refresh_fail)
+            load = false
         }
     }
 
 
     suspend fun loadContent() {
+        if (contentLoad) return else contentLoad = true
         val dark = lookerTheme == DarkColorPalette
         try {
             val response = MyRetrofit.api.getHtml(newsID).awaitResponse()
@@ -128,15 +135,21 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
                         .replace("//nimg", "https://nimg")
                         .replace("data-src=", "src=")
                         .replace("href=\"//", "href=\"https://")
+                        .replace("data-href=", "href=")
+                        .replace("alt=\"\"", "")
+                        .replace("href=\"#\"", "")
                         .replace("http://", "https://")
+                        .replace("<span>&#xe61d;<span>", "")
                         .replace(
                             "<!--yinsurance=endAD_insurance-->",
                             "<div class=\"insurance\">"
                         ) + "</div></body></html>"
                 }
                 Log.d("html", currentNews)
+                contentLoad = false
             }
         } catch (e: Exception) {
+            contentLoad = false
             Log.d("error", e.message!!)
         }
     }

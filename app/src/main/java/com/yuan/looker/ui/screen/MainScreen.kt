@@ -11,9 +11,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.ExitToApp
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -154,10 +156,12 @@ class MainScreen(private val context: MainActivity) {
 
         fun reloadNews() {
             context.launch {
+                if (viewModel.load) {
+                    viewModel.message(R.string.loading)
+                    return@launch
+                }
                 viewModel.newsIndex = 0
-                viewModel.load = true
                 viewModel.loadNews(viewModel.selectedTab)
-                viewModel.load = false
                 swipeRefreshState.isRefreshing = false
             }
         }
@@ -209,17 +213,17 @@ class MainScreen(private val context: MainActivity) {
                         lastEvent = { isLast ->
                             context.launch {
                                 if (!(viewModel.isNewsEnd() || viewModel.load)) {
-                                    if (viewModel.load || viewModel.isNewsEnd()) return@launch
-                                    viewModel.load = true
                                     if (isLast) viewModel.loadNews(viewModel.selectedTab)
+
                                     delay(100)
-                                    viewModel.load = false
                                 }
                             }
                         },
                         itemClick = { newsID ->
+                            viewModel.contentLoad = false
                             context.launch {
                                 viewModel.newsID = newsID
+
                                 viewModel.loadContent()
                             }
                             context.navController.navigate(Screen.ReadScreen.route)

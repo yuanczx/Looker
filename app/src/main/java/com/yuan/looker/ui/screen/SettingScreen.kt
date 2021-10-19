@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -45,14 +46,14 @@ class SettingScreen(private val context: MainActivity) {
                         tint = Color.White
                     )
                 }
-                Text(text = "设置", fontWeight = W600, fontSize = 20.sp,color = Color.White)
+                Text(text = stringResource(R.string.settings), fontWeight = W600, fontSize = 20.sp,color = Color.White)
             }
             val nightModeKey = booleanPreferencesKey("darkMode")
             settingUtils.Switcher(
                 key = nightModeKey,
-                title = "深色模式",
+                title = stringResource(R.string.dark_mode),
                 icon = painterResource(id = R.drawable.ic_invert_colors),
-                label = "是否开启深色模式跟随系统",
+                label = stringResource(R.string.follow_system),
                 itemClick = {
                     viewModel.darkMode = it
                 }
@@ -69,9 +70,9 @@ class SettingScreen(private val context: MainActivity) {
                     if (viewModel.darkMode) return@Selector
                     viewModel.lookerTheme =  viewModel.loadTheme()
                 },
-                title = "主题管理",
+                title = stringResource(R.string.theme_manage),
                 icon = painterResource(id = R.drawable.ic_theme),
-                label = "选择你喜欢的颜色",
+                label = stringResource(R.string.choose_color),
                 data = themeSelector,
                 iconSpaceReserve = true
             )

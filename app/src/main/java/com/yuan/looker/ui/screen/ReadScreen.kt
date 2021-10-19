@@ -4,14 +4,16 @@ import android.annotation.SuppressLint
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -27,6 +29,8 @@ import kotlinx.coroutines.delay
 
 class ReadScreen(private val context: MainActivity) {
     private val viewModel by context.viewModels<NewsViewModel>()
+
+    @ExperimentalAnimationApi
     @SuppressLint("SetJavaScriptEnabled")
     @Composable
     fun Screen() {
@@ -34,8 +38,20 @@ class ReadScreen(private val context: MainActivity) {
             delay(100)
             viewModel.loadContent()
         })
-        Column(modifier = Modifier.fillMaxSize()){
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             TopBar()
+            AnimatedVisibility(
+                viewModel.contentLoad,
+                modifier = Modifier.fillMaxSize(),
+                exit = fadeOut()
+            ) {
+                CircularProgressIndicator(modifier = Modifier.wrapContentSize())
+            }
+
             AndroidView(
                 modifier = Modifier.fillMaxSize(),
                 factory = {
@@ -51,14 +67,16 @@ class ReadScreen(private val context: MainActivity) {
                     }
                 },
                 update = {
-                    it.loadData(viewModel.currentNews,"text/html","UTF-8")
+                    it.loadData(viewModel.currentNews, "text/html", "UTF-8")
                 })
+
         }
 
 
     }
+
     @Composable
-    fun TopBar(){
+    fun TopBar() {
         TopAppBar(backgroundColor = MaterialTheme.colors.statusBar, elevation = 0.dp) {
             IconButton(onClick = {
                 context.navController.popBackStack()
