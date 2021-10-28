@@ -69,7 +69,7 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
         else -> DarkColorPalette
     }
 
-    fun isNewsEnd() = newsIndex >= 440
+    private fun isNewsEnd() = newsIndex >= 440
 
 
     private fun getSort(index: Int) = when (index) {
@@ -83,12 +83,16 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
 
 
     fun arrayRes(id: Int): Array<String> = context().resources.getStringArray(id)
-    fun stringRes(id: Int) = context().getString(id)
-    fun message(msg: String) = Toast.makeText(context(), msg, Toast.LENGTH_SHORT).show()
+    private fun stringRes(id: Int) = context().getString(id)
+    private fun message(msg: String) = Toast.makeText(context(), msg, Toast.LENGTH_SHORT).show()
     fun message(msgId: Int) = message(stringRes(msgId))
 
     //加载新闻
     suspend fun loadNews(tab: Int) {
+        if (isNewsEnd()) {
+            message(R.string.no_more)
+            return
+        }
         if (load) return else load = true
         val sort = getSort(tab)
         try {
@@ -121,6 +125,7 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
+    //加载新闻内容
     suspend fun loadContent() {
         if (contentLoad) return else contentLoad = true
         val dark = lookerTheme == DarkColorPalette
@@ -128,7 +133,7 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
             val response = MyRetrofit.api.getHtml(newsID).awaitResponse()
             if (response.isSuccessful) {
                 currentNews = with(response.body()!!) {
-                    getCss(dark) + substring(
+                    val s = getCss(dark) + substring(
                         indexOf("<div class=\"article-content\">"),
                         indexOf("</article>")
                     )
@@ -144,6 +149,7 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
                             "<!--yinsurance=endAD_insurance-->",
                             "<div class=\"insurance\">"
                         ) + "</div></body></html>"
+                    s
                 }
                 Log.d("html", currentNews)
                 contentLoad = false

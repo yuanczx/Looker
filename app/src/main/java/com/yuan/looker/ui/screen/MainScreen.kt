@@ -14,8 +14,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.ExitToApp
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -95,24 +94,24 @@ class MainScreen(private val context: MainActivity) {
                     .height(55.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { /*TODO*/ }) {
+                //退出应用
+                IconButton(onClick = { context.finish() }) {
                     Icon(
                         imageVector = Icons.Rounded.ExitToApp,
                         contentDescription = "Exit",
                         tint = MaterialTheme.colors.primary
                     )
                 }
-
-                IconButton(onClick = { /*TODO*/ }) {
+                //收藏
+                IconButton(onClick = { viewModel.message(R.string.construction) }) {
                     Icon(
                         imageVector = Icons.Outlined.FavoriteBorder,
                         contentDescription = "Favorite",
                         tint = MaterialTheme.colors.primary
                     )
                 }
-                IconButton(onClick = {
-                    context.navController.navigate(Screen.SettingScreen.route)
-                }) {
+                //进入设置界面
+                IconButton(onClick = { context.navController.navigate(Screen.SettingScreen.route) }) {
                     Icon(
                         imageVector = Icons.Outlined.Settings,
                         contentDescription = "Settings",
@@ -120,10 +119,7 @@ class MainScreen(private val context: MainActivity) {
                     )
                 }
             }
-
         }
-
-
     }
 
     @ExperimentalCoilApi
@@ -168,9 +164,25 @@ class MainScreen(private val context: MainActivity) {
 
         @Composable
         fun LookerTab(label: String, self: Int) {
+            var clickTimes by remember { mutableStateOf(0) }
             Tab(
                 selected = (viewModel.selectedTab == self),
                 onClick = {
+                    //双击跳转到列表顶部
+                    context.launch {
+                        clickTimes += 1
+                        delay(500)
+                        if (clickTimes != 0) {
+                            clickTimes = 0
+                        }
+                    }
+                    if (clickTimes >= 1) {
+                        clickTimes = 0
+                        context.launch {
+                            lazyListState.scrollToItem(0)
+                        }
+                    }
+                    /**********************************************/
                     if (viewModel.selectedTab != self) {
                         viewModel.selectedTab = self
                         viewModel.newsIndex = 0
@@ -212,10 +224,8 @@ class MainScreen(private val context: MainActivity) {
                         listState = lazyListState,
                         lastEvent = { isLast ->
                             context.launch {
-                                if (!(viewModel.isNewsEnd() || viewModel.load)) {
+                                if (!viewModel.load) {
                                     if (isLast) viewModel.loadNews(viewModel.selectedTab)
-
-                                    delay(100)
                                 }
                             }
                         },
