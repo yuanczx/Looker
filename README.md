@@ -9,9 +9,9 @@
 - 因为正在学 Jetpack Compose 因此便打算使用它Compose来开发一个APP
 
 ## 截图
-![main](https://github.com/yuanczx/Looker/blob/master/readme/ScreenShot1.jpg)
-![setting](https://github.com/yuanczx/Looker/blob/master/readme/ScreenShot2.jpg)
-![setting](https://github.com/yuanczx/Looker/blob/master/readme/ScreenShot3.jpg)
-![read](https://github.com/yuanczx/Looker/blob/master/readme/ScreenShot4.jpg)
-![darkmain](https://github.com/yuanczx/Looker/blob/master/readme/ScreenShot5.jpg)
-![darkread](https://github.com/yuanczx/Looker/blob/master/readme/ScreenShot6.jpg)
+![main](readme/ScreenShot1.jpg)
+![setting](readme/ScreenShot2.jpg)
+![setting](readme/ScreenShot3.jpg)
+![read](readme/ScreenShot4.jpg)
+![darkmain](readme/ScreenShot5.jpg)
+![darkread](readme/ScreenShot6.jpg)
