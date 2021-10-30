@@ -84,7 +84,7 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
 
     fun arrayRes(id: Int): Array<String> = context().resources.getStringArray(id)
     private fun stringRes(id: Int) = context().getString(id)
-    private fun message(msg: String) = Toast.makeText(context(), msg, Toast.LENGTH_SHORT).show()
+    fun message(msg: String) = Toast.makeText(context(), msg, Toast.LENGTH_SHORT).show()
     fun message(msgId: Int) = message(stringRes(msgId))
 
     //加载新闻

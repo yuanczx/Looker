@@ -2,7 +2,6 @@ package com.yuan.looker.ui.screen
 
 import android.annotation.SuppressLint
 import androidx.activity.viewModels
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -41,12 +40,15 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MainScreen(private val context: MainActivity) {
+@ExperimentalCoilApi
+@ExperimentalFoundationApi
+@Composable
+fun MainScreen(context: MainActivity) {
     //获取ViewModel
-    private val viewModel by context.viewModels<NewsViewModel>()
-
+    val viewModel by context.viewModels<NewsViewModel>()
+    val state = rememberScaffoldState()
     @Composable
-    private fun MyTopBar(scaffoldState: ScaffoldState) {
+    fun MyTopBar(scaffoldState: ScaffoldState) {
         val scope = rememberCoroutineScope()
         TopAppBar(backgroundColor = MaterialTheme.colors.statusBar, elevation = 0.dp) {
             IconButton(onClick = {
@@ -72,7 +74,7 @@ class MainScreen(private val context: MainActivity) {
     }
 
     @Composable
-    private fun MyDrawer() {
+    fun MyDrawer() {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween,
@@ -122,24 +124,8 @@ class MainScreen(private val context: MainActivity) {
         }
     }
 
-    @ExperimentalCoilApi
-    @ExperimentalAnimationApi
-    @ExperimentalFoundationApi
-    @Composable
-    fun Screen() {
-        val state = rememberScaffoldState()
-        Box(modifier = Modifier.fillMaxSize()) {
-            Scaffold(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colors.background),
-                topBar = { MyTopBar(state) },
-                drawerContent = { MyDrawer() },
-                scaffoldState = state,
-                content = { Content() }
-            )
-        }
-    }
+
+
 
     @ExperimentalCoilApi
     @SuppressLint("CoroutineCreationDuringComposition")
@@ -264,6 +250,18 @@ class MainScreen(private val context: MainActivity) {
                 context.splash = true
             }
         }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background),
+            topBar = { MyTopBar(state) },
+            drawerContent = { MyDrawer() },
+            scaffoldState = state,
+            content = { Content() }
+        )
     }
 }
 

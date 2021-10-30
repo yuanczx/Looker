@@ -27,53 +27,12 @@ import com.yuan.looker.ui.theme.statusBar
 import com.yuan.looker.viewmodel.NewsViewModel
 import kotlinx.coroutines.delay
 
-class ReadScreen(private val context: MainActivity) {
-    private val viewModel by context.viewModels<NewsViewModel>()
+@SuppressLint("SetJavaScriptEnabled")
+@ExperimentalAnimationApi
+@Composable
+fun ReadScreen(context: MainActivity) {
+    val viewModel by context.viewModels<NewsViewModel>()
 
-    @ExperimentalAnimationApi
-    @SuppressLint("SetJavaScriptEnabled")
-    @Composable
-    fun Screen() {
-        LaunchedEffect(key1 = viewModel.lookerTheme, block = {
-            delay(100)
-            viewModel.loadContent()
-        })
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            TopBar()
-            AnimatedVisibility(
-                viewModel.contentLoad,
-                modifier = Modifier.fillMaxSize(),
-                exit = fadeOut()
-            ) {
-                CircularProgressIndicator(modifier = Modifier.wrapContentSize())
-            }
-
-            AndroidView(
-                modifier = Modifier.fillMaxSize(),
-                factory = {
-                    WebView(it).apply {
-                        settings.apply {
-                            javaScriptEnabled = true
-                            javaScriptCanOpenWindowsAutomatically = true
-                            loadsImagesAutomatically = true
-                            blockNetworkImage = false
-                            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                            //webViewClient = WebViewClient()
-                        }
-                    }
-                },
-                update = {
-                    it.loadData(viewModel.currentNews, "text/html", "UTF-8")
-                })
-
-        }
-
-
-    }
 
     @Composable
     fun TopBar() {
@@ -98,4 +57,45 @@ class ReadScreen(private val context: MainActivity) {
 
         }
     }
+
+
+    LaunchedEffect(key1 = viewModel.lookerTheme, block = {
+        delay(100)
+        viewModel.loadContent()
+    })
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        TopBar()
+        AnimatedVisibility(
+            viewModel.contentLoad,
+            modifier = Modifier.fillMaxSize(),
+            exit = fadeOut()
+        ) {
+            CircularProgressIndicator(modifier = Modifier.wrapContentSize())
+        }
+
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = {
+                WebView(it).apply {
+                    settings.apply {
+                        javaScriptEnabled = true
+                        javaScriptCanOpenWindowsAutomatically = true
+                        loadsImagesAutomatically = true
+                        blockNetworkImage = false
+                        mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                        //webViewClient = WebViewClient()
+                    }
+                }
+            },
+            update = {
+                it.loadData(viewModel.currentNews, "text/html", "UTF-8")
+            })
+
+    }
+
+
 }

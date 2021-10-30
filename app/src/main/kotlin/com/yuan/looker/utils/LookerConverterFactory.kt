@@ -33,9 +33,7 @@ class LookerConverterFactory : Converter.Factory() {
     }
 
     class HtmlConverter : Converter<ResponseBody, String> {
-        override fun convert(value: ResponseBody): String? {
-            return value.string()
-        }
+        override fun convert(value: ResponseBody): String? =value.string()
 
     }
 }

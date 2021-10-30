@@ -34,18 +34,19 @@ class Setting(private val context: MainActivity) {
         title: String = "",//标题
         icon: Painter? = null,//图标
         label: String? = null,//标签
-        itemClick: suspend (Boolean) -> Unit={}
+        itemClick: (suspend (Boolean) -> Unit)? = null
     ) {
         //定义变量
         var switch by remember { mutableStateOf(false) }
         //获取DataStore数据
         context.launch {
-            switch = context.dataStore.data.first()[key]?:false
+            switch = context.dataStore.data.first()[key] ?: false
         }
 
         //Compose界面
         BasicSetting(icon, title, label, itemClick = {
-            context.launch {switch = !switch
+            context.launch {
+                switch = !switch
                 context.dataStore.edit {
                     it[key] = switch
                 }
@@ -64,7 +65,11 @@ class Setting(private val context: MainActivity) {
         }
         //开关
         LaunchedEffect(key1 = switch, block = {
-            context.launch { itemClick(switch) }
+            context.launch {
+                itemClick?.let {
+                    it(switch)
+                }
+            }
         })
     }
 
@@ -127,8 +132,8 @@ class Setting(private val context: MainActivity) {
         label: String? = null,//标签
         itemClick: (Int) -> Unit = {}//标签
         //Modifier
-        ) {
-            val visibility = remember {
+    ) {
+        val visibility = remember {
             mutableStateOf(false)
         }
 
@@ -207,14 +212,16 @@ class Setting(private val context: MainActivity) {
             }
         }
     }
+
     //通用Compose
-     fun writeData(key: Preferences.Key<Boolean>, switch: Boolean) {
+    private fun writeData(key: Preferences.Key<Boolean>, switch: Boolean) {
         context.launch {
             context.dataStore.edit {
                 it[key] = switch
             }
         }
     }
+
     private fun writeData(key: Preferences.Key<String>, text: String) {
         context.launch {
             context.dataStore.edit {
@@ -222,9 +229,11 @@ class Setting(private val context: MainActivity) {
             }
         }
     }
+
     private suspend fun readData(key: Preferences.Key<Int>) =
         context.dataStore.data.first()[key] ?: 0
+
     @JvmName("readData2")
     private suspend fun readData(key: Preferences.Key<String>) =
         context.dataStore.data.first()[key] ?: ""
-    }
+}
