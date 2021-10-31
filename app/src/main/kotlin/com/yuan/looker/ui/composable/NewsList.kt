@@ -26,7 +26,8 @@ import coil.transform.RoundedCornersTransformation
 import com.yuan.looker.model.NetEaseNewsItem
 import com.yuan.looker.ui.theme.listBack
 
-fun LazyListState.isScrolledToTheEnd() =layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+fun LazyListState.isScrolledToTheEnd(): Boolean =
+    layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
 
 @ExperimentalCoilApi
 @Composable
@@ -46,69 +47,92 @@ fun NewsList(
             NewsItem(newsItem = item, itemClick)
         }
         item {
-            Row( Modifier.fillMaxWidth().height(30.dp), horizontalArrangement = Arrangement.Center) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .height(30.dp), horizontalArrangement = Arrangement.Center
+            ) {
                 CircularProgressIndicator(modifier = Modifier.size(25.dp), strokeWidth = 3.dp)
-                Text(text = "Loading", modifier = Modifier.padding(start = 10.dp).fillMaxHeight(), textAlign = TextAlign.Center, fontWeight = W700 ) }
+                Text(
+                    text = "Loading",
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .fillMaxHeight(),
+                    textAlign = TextAlign.Center,
+                    fontWeight = W700
+                )
+            }
         }
 
     }
-    lastEvent?.let {it(listState.isScrolledToTheEnd())}
+    lastEvent?.let { it(listState.isScrolledToTheEnd()) }
 }
 
 @ExperimentalCoilApi
 @Composable
-fun NewsItem(newsItem:NetEaseNewsItem,itemClick: (String) -> Unit) {
-    Box(Modifier.fillMaxWidth().width(150.dp)){
-    Card(backgroundColor = MaterialTheme.colors.background,
-        modifier = Modifier
+fun NewsItem(newsItem: NetEaseNewsItem, itemClick: (String) -> Unit) {
+    Box(
+        Modifier
             .fillMaxWidth()
-            .height(140.dp)
-            .padding(top = 4.dp, bottom = 4.dp)
-            .clickable { itemClick(newsItem.docid) },
-        elevation = 0.dp,
-        shape = RoundedCornerShape(0.dp),
+            .width(150.dp)
     ) {
-        Row( modifier = Modifier
+        Card(
+            backgroundColor = MaterialTheme.colors.background,
+            modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()) {
-            val imageSrc = newsItem.imgsrc.replace("http", "https")
-            Column(
-                Modifier
-                    .fillMaxWidth(0.6f)
-                    .fillMaxHeight()
-                    .padding(start = 5.dp, end = 5.dp,top = 5.dp,bottom = 6.dp),verticalArrangement = Arrangement.SpaceBetween) {
-            Text(
-                text = newsItem.title,
-                fontWeight = W700,
-                fontSize = 18.sp,
-                color = MaterialTheme.colors.onSurface,
-                maxLines = 3,
-            )
-            Row(Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(
-                text = newsItem.source,
-                fontWeight = W300,
-                fontSize = 13.sp,
-                color = MaterialTheme.colors.onSurface,
-                maxLines = 1,
-            )
-            Text(
-                text = newsItem.ptime,
-                fontWeight = W300,
-                fontSize = 13.sp,
-                color = MaterialTheme.colors.onSurface,
-                maxLines = 1,
-            )}}
-            Image(
-                painter = rememberImagePainter(data = imageSrc,
-                    builder = { transformations(RoundedCornersTransformation(20f)) }),
-                contentDescription = "News Image",
+                .height(140.dp)
+                .padding(top = 4.dp, bottom = 4.dp)
+                .clickable { itemClick(newsItem.docid) },
+            elevation = 0.dp,
+            shape = RoundedCornerShape(0.dp),
+        ) {
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .padding(5.dp)
-            )
+            ) {
+                val imageSrc = newsItem.imgsrc.replace("http", "https")
+                Column(
+                    Modifier
+                        .fillMaxWidth(0.6f)
+                        .fillMaxHeight()
+                        .padding(start = 5.dp, end = 5.dp, top = 5.dp, bottom = 6.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = newsItem.title,
+                        fontWeight = W700,
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colors.onSurface,
+                        maxLines = 3,
+                    )
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(
+                            text = newsItem.source,
+                            fontWeight = W300,
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colors.onSurface,
+                            maxLines = 1,
+                        )
+                        Text(
+                            text = newsItem.ptime,
+                            fontWeight = W300,
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colors.onSurface,
+                            maxLines = 1,
+                        )
+                    }
+                }
+                Image(
+                    painter = rememberImagePainter(data = imageSrc,
+                        builder = { transformations(RoundedCornersTransformation(20f)) }),
+                    contentDescription = "News Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(5.dp)
+                )
+            }
         }
-    }
     }
 }

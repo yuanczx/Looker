@@ -25,215 +25,202 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-
-class Setting(private val context: MainActivity) {
-    @SuppressLint("CoroutineCreationDuringComposition")
-    @Composable
-    fun Switcher(
-        key: Preferences.Key<Boolean>,//DataStore key
-        title: String = "",//标题
-        icon: Painter? = null,//图标
-        label: String? = null,//标签
-        itemClick: (suspend (Boolean) -> Unit)? = null
-    ) {
-        //定义变量
-        var switch by remember { mutableStateOf(false) }
-        //获取DataStore数据
-        context.launch {
-            switch = context.dataStore.data.first()[key] ?: false
-        }
-
-        //Compose界面
-        BasicSetting(icon, title, label, itemClick = {
-            context.launch {
-                switch = !switch
-                context.dataStore.edit {
-                    it[key] = switch
-                }
-
-            }
-        }) {
-            Switch(
-                checked = switch,
-                modifier = Modifier.padding(end = 10.dp),
-                onCheckedChange = {
-                    switch = it
-                    writeData(key, it)
-                },
-                colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colors.primary)
-            )
-        }
-        //开关
-        LaunchedEffect(key1 = switch, block = {
-            context.launch {
-                itemClick?.let {
-                    it(switch)
-                }
-            }
-        })
+@SuppressLint("CoroutineCreationDuringComposition")
+@Composable
+fun Switcher(
+    context: MainActivity,
+    key: Preferences.Key<Boolean>,//DataStore key
+    title: String = "",//标题
+    icon: Painter? = null,//图标
+    label: String? = null,//标签
+    itemClick: (suspend (Boolean) -> Unit)? = null
+) {
+    //定义变量
+    var switch by remember { mutableStateOf(false) }
+    //获取DataStore数据
+    context.launch {
+        switch = context.dataStore.data.first()[key] ?: false
     }
-
-    @SuppressLint("CoroutineCreationDuringComposition")
-    @ExperimentalAnimationApi
-    @Composable
-    fun Editor(
-        key: Preferences.Key<String>,
-        title: String,
-        icon: Painter? = null,
-        label: String? = null,
-        iconSpaceReserve: Boolean = true,
-        itemClick: () -> Unit = {}
-    ) {
-        var visible by remember {
-            mutableStateOf(false)
-        }
-        var text by remember {
-            mutableStateOf("")
-        }
+    //Compose界面
+    BasicSetting(icon, title, label, itemClick = {
         context.launch {
-            text = readData(key)
-        }
-        Column {
-            BasicSetting(
-                icon = icon,
-                title = title,
-                label = label,
-                iconSpaceReserve = iconSpaceReserve,
-                itemClick = {
-                    visible = !visible
-                    itemClick()
-                }) {}
-            AnimatedVisibility(visible = visible) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                        .background(MaterialTheme.colors.settingBg),
-                    value = text,
-                    singleLine = true,
-                    onValueChange = {
-                        text = it
-                        writeData(key, it)
-                    })
-            }
-        }
-    }
-
-
-    @SuppressLint("CoroutineCreationDuringComposition")
-    @ExperimentalAnimationApi
-    @Composable
-    fun Selector(
-        key: Preferences.Key<Int>,//DataStore key
-        title: String,//标题
-        data: Array<String>,//数据
-        icon: Painter? = null,//图标
-        iconSpaceReserve: Boolean = true,
-        label: String? = null,//标签
-        itemClick: (Int) -> Unit = {}//标签
-        //Modifier
-    ) {
-        val visibility = remember {
-            mutableStateOf(false)
-        }
-
-        var item by remember {
-            mutableStateOf(0)
-        }
-
-        context.launch {
-            item = readData(key)
-            cancel()
-        }
-
-
-        Column {
-            BasicSetting(
-                icon = icon,
-                title = title,
-                label = label,
-                iconSpaceReserve = iconSpaceReserve,
-                content = {
-
-                    Spacer(modifier = Modifier.weight(0.7f))
-                    OutlinedButton(
-                        modifier = Modifier
-                            .height(30.dp)
-                            .padding(end = 10.dp),
-                        border = BorderStroke(2.dp, MaterialTheme.colors.primary),
-                        shape = RoundedCornerShape(45),
-                        onClick = {}) {
-                        Text(
-                            text = data[item],
-                            fontSize = 13.sp,
-                            softWrap = true,
-                            maxLines = 1
-                        )
-                    }
-                },
-                itemClick = { visibility.value = !visibility.value })
-
-            AnimatedVisibility(visible = visibility.value) {
-                Column(Modifier.background(MaterialTheme.colors.settingBg)) {
-                    fun rowClick(index: Int) {
-                        item = index
-                        context.launch {
-                            context.dataStore.edit { it[key] = index }
-                            itemClick(index)
-                        }
-                    }
-                    repeat(data.size) { index ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp)
-                                .clickable {
-                                    rowClick(index)
-                                },
-                            //horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-                                selected = index == item,
-                                onClick = {
-                                    rowClick(index)
-                                })
-                            Text(
-                                modifier = Modifier.padding(end = 10.dp),
-                                text = data[index],
-                                color = Gray500
-                            )
-                        }
-
-                    }
-                }
-
-            }
-        }
-    }
-
-    //通用Compose
-    private fun writeData(key: Preferences.Key<Boolean>, switch: Boolean) {
-        context.launch {
+            switch = !switch
             context.dataStore.edit {
                 it[key] = switch
             }
-        }
-    }
 
-    private fun writeData(key: Preferences.Key<String>, text: String) {
+        }
+    }) {
+        Switch(
+            checked = switch,
+            modifier = Modifier.padding(end = 10.dp),
+            onCheckedChange = { it ->
+                switch = it
+                context.launch {
+                    context.dataStore.edit { data ->
+                        data[key] = switch
+                    }
+                }
+            },
+            colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colors.primary)
+        )
+    }
+    //开关
+    LaunchedEffect(key1 = switch, block = {
         context.launch {
-            context.dataStore.edit {
-                it[key] = text
+            itemClick?.let {
+                it(switch)
             }
         }
+    })
+}
+
+@SuppressLint("CoroutineCreationDuringComposition")
+@ExperimentalAnimationApi
+@Composable
+fun Editor(
+    context: MainActivity,
+    key: Preferences.Key<String>,
+    title: String,
+    icon: Painter? = null,
+    label: String? = null,
+    iconSpaceReserve: Boolean = true,
+    itemClick: () -> Unit = {}
+) {
+    var visible by remember {
+        mutableStateOf(false)
+    }
+    var text by remember {
+        mutableStateOf("")
+    }
+    context.launch {
+        text = context.dataStore.data.first()[key] ?: ""
+    }
+    Column {
+        BasicSetting(
+            icon = icon,
+            title = title,
+            label = label,
+            iconSpaceReserve = iconSpaceReserve,
+            itemClick = {
+                visible = !visible
+                itemClick()
+            }) {}
+        AnimatedVisibility(visible = visible) {
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+                    .background(MaterialTheme.colors.settingBg),
+                value = text,
+                singleLine = true,
+                onValueChange = {
+                    text = it
+                    context.launch {
+                        context.dataStore.edit { data ->
+                            data[key] = it
+
+                        }
+                    }
+
+                })
+        }
+    }
+}
+
+
+@SuppressLint("CoroutineCreationDuringComposition")
+@ExperimentalAnimationApi
+@Composable
+fun Selector(
+    context: MainActivity,
+    key: Preferences.Key<Int>,//DataStore key
+    title: String,//标题
+    data: Array<String>,//数据
+    icon: Painter? = null,//图标
+    iconSpaceReserve: Boolean = true,
+    label: String? = null,//标签
+    itemClick: (Int) -> Unit = {}//标签
+    //Modifier
+) {
+    val visibility = remember {
+        mutableStateOf(false)
     }
 
-    private suspend fun readData(key: Preferences.Key<Int>) =
-        context.dataStore.data.first()[key] ?: 0
+    var item by remember {
+        mutableStateOf(0)
+    }
 
-    @JvmName("readData2")
-    private suspend fun readData(key: Preferences.Key<String>) =
-        context.dataStore.data.first()[key] ?: ""
+    context.launch {
+        item = context.dataStore.data.first()[key] ?: 0
+        cancel()
+    }
+
+
+    Column {
+        BasicSetting(
+            icon = icon,
+            title = title,
+            label = label,
+            iconSpaceReserve = iconSpaceReserve,
+            content = {
+
+                Spacer(modifier = Modifier.weight(0.7f))
+                OutlinedButton(
+                    modifier = Modifier
+                        .height(30.dp)
+                        .padding(end = 10.dp),
+                    border = BorderStroke(2.dp, MaterialTheme.colors.primary),
+                    shape = RoundedCornerShape(45),
+                    onClick = {}) {
+                    Text(
+                        text = data[item],
+                        fontSize = 13.sp,
+                        softWrap = true,
+                        maxLines = 1
+                    )
+                }
+            },
+            itemClick = { visibility.value = !visibility.value })
+
+        AnimatedVisibility(visible = visibility.value) {
+            Column(Modifier.background(MaterialTheme.colors.settingBg)) {
+                fun rowClick(index: Int) {
+                    item = index
+                    context.launch {
+                        context.dataStore.edit { it[key] = index }
+                        itemClick(index)
+                    }
+                }
+                repeat(data.size) { index ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .clickable {
+                                rowClick(index)
+                            },
+                        //horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                            selected = index == item,
+                            onClick = {
+                                rowClick(index)
+                            })
+                        Text(
+                            modifier = Modifier.padding(end = 10.dp),
+                            text = data[index],
+                            color = Gray500
+                        )
+                    }
+
+                }
+            }
+
+        }
+    }
 }
+
+//通用Compose

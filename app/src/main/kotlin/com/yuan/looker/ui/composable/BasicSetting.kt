@@ -25,13 +25,13 @@ fun BasicSetting(
     content: @Composable () -> Unit = {}//内容
 ) {
     Row(
-       modifier = Modifier
-           .fillMaxWidth()
-           .height(60.dp)
-          .clickable {
-              itemClick()
-          },
-       horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .clickable {
+                itemClick()
+            },
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(contentAlignment = Alignment.CenterStart) {

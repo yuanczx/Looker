@@ -132,7 +132,7 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
         try {
             val response = MyRetrofit.api.getHtml(newsID).awaitResponse()
             if (response.isSuccessful) {
-                currentNews = with(response.body()!!) {
+                currentNews = with(response.body() ?: return) {
                     val s = getCss(dark) + substring(
                         indexOf("<div class=\"article-content\">"),
                         indexOf("</article>")
@@ -156,7 +156,7 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
             }
         } catch (e: Exception) {
             contentLoad = false
-            Log.d("error", e.message!!)
+            Log.d("error", e.message ?: return)
         }
     }
 

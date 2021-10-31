@@ -19,7 +19,8 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.yuan.looker.R
 import com.yuan.looker.activity.MainActivity
-import com.yuan.looker.ui.composable.Setting
+import com.yuan.looker.ui.composable.Selector
+import com.yuan.looker.ui.composable.Switcher
 import com.yuan.looker.ui.theme.statusBar
 import com.yuan.looker.viewmodel.NewsViewModel
 
@@ -27,7 +28,6 @@ import com.yuan.looker.viewmodel.NewsViewModel
 @Composable
 fun SettingScreen(context: MainActivity) {
     val viewModel by context.viewModels<NewsViewModel>()
-    val settingUtils = Setting(context)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,7 +51,8 @@ fun SettingScreen(context: MainActivity) {
             )
         }
         val nightModeKey = booleanPreferencesKey("darkMode")
-        settingUtils.Switcher(
+        Switcher(
+            context = context,
             key = nightModeKey,
             title = stringResource(R.string.dark_mode),
             icon = painterResource(id = R.drawable.ic_invert_colors),
@@ -64,7 +65,8 @@ fun SettingScreen(context: MainActivity) {
         val themeSelector = viewModel.arrayRes(R.array.theme)
         val themeKey = intPreferencesKey("theme")
 
-        settingUtils.Selector(
+        Selector(
+            context = context,
             key = themeKey,
             itemClick = { index ->
                 viewModel.themeIndex = index

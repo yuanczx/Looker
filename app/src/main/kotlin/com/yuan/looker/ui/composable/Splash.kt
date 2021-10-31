@@ -21,7 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun Splash(context:MainActivity,splash: Boolean,bg:Color= Blue700) {
+fun Splash(context: MainActivity, splash: Boolean, bg: Color = Blue700) {
     Column(
         modifier = if (splash) Modifier.size(0.dp) else Modifier
             .fillMaxSize()
