@@ -1,10 +1,9 @@
 package com.yuan.looker.ui.composable
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +24,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+@ExperimentalAnimationApi
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun Switcher(
@@ -53,8 +53,7 @@ fun Switcher(
     }) {
         Switch(
             checked = switch,
-            modifier = Modifier.padding(end = 10.dp),
-            onCheckedChange = { it ->
+            onCheckedChange = {
                 switch = it
                 context.launch {
                     context.dataStore.edit { data ->
@@ -87,45 +86,41 @@ fun Editor(
     iconSpaceReserve: Boolean = true,
     itemClick: () -> Unit = {}
 ) {
-    var visible by remember {
-        mutableStateOf(false)
-    }
     var text by remember {
         mutableStateOf("")
     }
     context.launch {
         text = context.dataStore.data.first()[key] ?: ""
     }
-    Column {
-        BasicSetting(
-            icon = icon,
-            title = title,
-            label = label,
-            iconSpaceReserve = iconSpaceReserve,
-            itemClick = {
-                visible = !visible
-                itemClick()
-            }) {}
-        AnimatedVisibility(visible = visible) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .background(MaterialTheme.colors.settingBg),
-                value = text,
-                singleLine = true,
-                onValueChange = {
-                    text = it
-                    context.launch {
-                        context.dataStore.edit { data ->
-                            data[key] = it
 
-                        }
+
+    @Composable
+    fun SettingEditor() {
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+                .background(MaterialTheme.colors.settingBg),
+            value = text,
+            singleLine = true,
+            onValueChange = {
+                text = it
+                context.launch {
+                    context.dataStore.edit { data ->
+                        data[key] = it
                     }
-
-                })
-        }
+                }
+            })
     }
+    BasicSetting(
+        icon = icon,
+        title = title,
+        label = label,
+        iconSpaceReserve = iconSpaceReserve,
+        expand = { SettingEditor() },
+        itemClick = {
+            itemClick()
+        })
 }
 
 
@@ -141,86 +136,97 @@ fun Selector(
     iconSpaceReserve: Boolean = true,
     label: String? = null,//标签
     itemClick: (Int) -> Unit = {}//标签
-    //Modifier
 ) {
-    val visibility = remember {
-        mutableStateOf(false)
-    }
 
-    var item by remember {
-        mutableStateOf(0)
-    }
+    var item by remember { mutableStateOf(0) }
 
     context.launch {
         item = context.dataStore.data.first()[key] ?: 0
         cancel()
     }
-
-
-    Column {
-        BasicSetting(
-            icon = icon,
-            title = title,
-            label = label,
-            iconSpaceReserve = iconSpaceReserve,
-            content = {
-
-                Spacer(modifier = Modifier.weight(0.7f))
-                OutlinedButton(
-                    modifier = Modifier
-                        .height(30.dp)
-                        .padding(end = 10.dp),
-                    border = BorderStroke(2.dp, MaterialTheme.colors.primary),
-                    shape = RoundedCornerShape(45),
-                    onClick = {}) {
-                    Text(
-                        text = data[item],
-                        fontSize = 13.sp,
-                        softWrap = true,
-                        maxLines = 1
-                    )
-                }
-            },
-            itemClick = { visibility.value = !visibility.value })
-
-        AnimatedVisibility(visible = visibility.value) {
-            Column(Modifier.background(MaterialTheme.colors.settingBg)) {
-                fun rowClick(index: Int) {
-                    item = index
-                    context.launch {
-                        context.dataStore.edit { it[key] = index }
-                        itemClick(index)
-                    }
-                }
-                repeat(data.size) { index ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .clickable {
-                                rowClick(index)
-                            },
-                        //horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-                            selected = index == item,
-                            onClick = {
-                                rowClick(index)
-                            })
-                        Text(
-                            modifier = Modifier.padding(end = 10.dp),
-                            text = data[index],
-                            color = Gray500
-                        )
-                    }
-
+    @Composable
+    fun SettingSelector() {
+        Column(Modifier.background(MaterialTheme.colors.settingBg)) {
+            fun rowClick(index: Int) {
+                item = index
+                context.launch {
+                    context.dataStore.edit { it[key] = index }
+                    itemClick(index)
                 }
             }
+            repeat(data.size) { index ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .clickable {
+                            rowClick(index)
+                        },
+                    //horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                        selected = index == item,
+                        onClick = {
+                            rowClick(index)
+                        })
+                    Text(
+                        modifier = Modifier.padding(end = 10.dp),
+                        text = data[index],
+                        color = Gray500
+                    )
+                }
 
+            }
         }
+
     }
+    BasicSetting(
+        icon = icon,
+        title = title,
+        label = label,
+        iconSpaceReserve = iconSpaceReserve,
+        expand = { SettingSelector() },
+        content = {
+            Box(
+                modifier = Modifier
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colors.primary,
+                        shape = RoundedCornerShape(45.dp)
+                    )
+
+            ) {
+                Text(
+                    modifier = Modifier.padding(
+                        start = 10.dp,
+                        end = 10.dp,
+                        top = 6.dp,
+                        bottom = 6.dp
+                    ),
+                    color = MaterialTheme.colors.primary,
+                    text = data[item],
+                    fontSize = 12.sp,
+                    softWrap = true,
+                    maxLines = 1
+                )
+            }
+        },
+        itemClick = { itemClick(item) })
+
+
 }
 
-//通用Compose
+//@Composable
+//fun Slider(
+//    context: MainActivity,
+//    key: Preferences.Key<Float>,
+//    title: String,
+//    icon: Painter? = null,
+//    iconSpaceReserve: Boolean = true,
+//    label: String? = null,
+//    itemClick: () -> Unit
+//) {
+//    BasicSetting(icon = icon, title = title, label = label, iconSpaceReserve = iconSpaceReserve)
+//}

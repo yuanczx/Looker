@@ -1,11 +1,13 @@
 package com.yuan.looker.ui.composable
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -15,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import com.yuan.looker.ui.theme.Gray300
 import com.yuan.looker.ui.theme.Gray500
 
+@ExperimentalAnimationApi
 @Composable
 fun BasicSetting(
     icon: Painter?,//图标
@@ -22,19 +25,22 @@ fun BasicSetting(
     label: String?,//标签
     itemClick: (() -> Unit) = {},//点击事件
     iconSpaceReserve: Boolean = true,//保留图标占位
+    expand: @Composable (() -> Unit)? = null,
     content: @Composable () -> Unit = {}//内容
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .clickable {
-                itemClick()
-            },
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(contentAlignment = Alignment.CenterStart) {
+    var visible by remember { mutableStateOf(false) }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .clickable {
+                    itemClick()
+                    visible = !visible
+                },
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             //图标
             icon?.let {
                 Icon(
@@ -48,7 +54,8 @@ fun BasicSetting(
             }
             //文字
             Column(
-                modifier = Modifier.padding(start = if (iconSpaceReserve) 55.dp else 12.dp),
+                modifier = Modifier
+                    .padding(start = if (iconSpaceReserve) 15.dp else 12.dp),
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
@@ -61,8 +68,21 @@ fun BasicSetting(
                     Text(text = it, fontSize = 13.sp, color = Gray300)
                 }
             }
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(end = 10.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                content()
+            }
 
         }
-        content()
+
+    }
+    if (expand != null) {
+        AnimatedVisibility(visible = visible) {
+            expand()
+        }
     }
 }
