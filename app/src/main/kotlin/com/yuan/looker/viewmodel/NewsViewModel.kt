@@ -33,7 +33,9 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
+
     private fun context() = getApplication<Application>().applicationContext
+    private var toast: Toast = Toast(context())
     var newsID by mutableStateOf("")
 
     //主题索引
@@ -83,9 +85,14 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
 
 
     fun arrayRes(id: Int): Array<String> = context().resources.getStringArray(id)
+
     private fun stringRes(id: Int) = context().getString(id)
-    fun message(msg: String) = Toast.makeText(context(), msg, Toast.LENGTH_SHORT).show()
-    fun message(msgId: Int) = message(stringRes(msgId))
+
+    fun message(msgID: Int) {
+        toast.setText(msgID)
+        toast.duration = Toast.LENGTH_SHORT
+        toast.show()
+    }
 
     //加载新闻
     suspend fun loadNews(tab: Int) {
@@ -98,7 +105,7 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
         try {
             val response = MyRetrofit.api.getNews(sort.name, newsIndex).awaitResponse()
             if (response.isSuccessful) {
-                val data = response.body()!!
+                val data = response.body() ?: return
                 //过滤：移除空元素
                 data.removeIf {
                     with(it) {
@@ -112,7 +119,6 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 newsIndex += 10
                 Log.d("index", newsIndex.toString())
-
                 load = false
             }
         } catch (e: UnknownHostException) {

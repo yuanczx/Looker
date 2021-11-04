@@ -16,12 +16,10 @@ import androidx.compose.material.icons.rounded.ExitToApp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
@@ -30,9 +28,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.yuan.looker.R
 import com.yuan.looker.activity.MainActivity
-import com.yuan.looker.activity.splash
 import com.yuan.looker.ui.composable.NewsList
-import com.yuan.looker.ui.theme.Blue500
 import com.yuan.looker.ui.theme.statusBar
 import com.yuan.looker.utils.sealed.Screen
 import com.yuan.looker.viewmodel.NewsViewModel
@@ -47,9 +43,10 @@ fun MainScreen(context: MainActivity) {
     //获取ViewModel
     val viewModel by context.viewModels<NewsViewModel>()
     val state = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+
     @Composable
     fun MyTopBar(scaffoldState: ScaffoldState) {
-        val scope = rememberCoroutineScope()
         TopAppBar(backgroundColor = MaterialTheme.colors.statusBar, elevation = 0.dp) {
             IconButton(onClick = {
                 scope.launch {
@@ -125,8 +122,6 @@ fun MainScreen(context: MainActivity) {
     }
 
 
-
-
     @ExperimentalCoilApi
     @SuppressLint("CoroutineCreationDuringComposition")
     @ExperimentalFoundationApi
@@ -140,6 +135,7 @@ fun MainScreen(context: MainActivity) {
             context.launch {
                 if (viewModel.load) {
                     viewModel.message(R.string.loading)
+                    swipeRefreshState.isRefreshing = false
                     return@launch
                 }
                 viewModel.newsIndex = 0
@@ -228,30 +224,6 @@ fun MainScreen(context: MainActivity) {
             }
         }
     }
-
-    @Composable
-    fun Splash(splash: Boolean) {
-        Column(
-            modifier = if (splash) Modifier.size(0.dp) else Modifier
-                .fillMaxSize()
-                .background(Blue500),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = CenterHorizontally
-        ) {
-            Text(
-                text = "Looker",
-                fontSize = 50.sp,
-                fontWeight = FontWeight.W900,
-                textAlign = TextAlign.Center,
-                color = Color.White
-            )
-            context.launch {
-                delay(500)
-                context.splash = true
-            }
-        }
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             modifier = Modifier

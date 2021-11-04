@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -71,14 +72,15 @@ fun ReadScreen(context: MainActivity) {
         TopBar()
         AnimatedVisibility(
             viewModel.contentLoad,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background),
             exit = fadeOut()
         ) {
             CircularProgressIndicator(modifier = Modifier.wrapContentSize())
         }
 
         AndroidView(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .background(MaterialTheme.colors.background),
             factory = {
                 WebView(it).apply {
                     settings.apply {
