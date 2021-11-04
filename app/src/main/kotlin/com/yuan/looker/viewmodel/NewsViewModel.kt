@@ -112,20 +112,29 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
                         docid.isBlank() || title.isBlank() || imgsrc.isBlank() || source.isBlank()
                     }
                 }
-                if (newsIndex == 0) news = listOf()
-                news = news.plus(data)
                 if (newsIndex == 0) {
+                    news = data
                     message(R.string.refresh_success)
+                } else {
+                    news = news.plus(data).toMutableList()
                 }
                 newsIndex += 10
                 Log.d("index", newsIndex.toString())
                 load = false
             }
         } catch (e: UnknownHostException) {
-            message(R.string.refresh_fail)
+            load = false
+            if (newsIndex == 0)
+                message(R.string.refresh_fail)
+            else
+                message(R.string.load_fail)
             load = false
         } catch (e: Exception) {
-            message(R.string.refresh_fail)
+            load = false
+            if (newsIndex == 0)
+                message(R.string.refresh_fail)
+            else
+                message(R.string.load_fail)
             load = false
         }
     }

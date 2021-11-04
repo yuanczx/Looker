@@ -11,6 +11,8 @@
     <string name="choose_color">选择你喜欢的颜色</string>
     <string name="no_more">没有更多了😓</string>
     <string name="construction">正在施工中</string>
+    <string name="load_fail">加载失败</string>
+    <string name="reload">重新加载</string>
     <string-array name="sorts">
         <item>新闻</item>
         <item>财经</item>

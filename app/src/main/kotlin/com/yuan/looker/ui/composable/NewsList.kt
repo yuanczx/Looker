@@ -9,12 +9,11 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.W300
 import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.style.TextAlign
@@ -23,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.transform.RoundedCornersTransformation
+import com.yuan.looker.R
 import com.yuan.looker.model.NetEaseNewsItem
 import com.yuan.looker.ui.theme.listBack
 
@@ -34,18 +34,36 @@ fun LazyListState.isScrolledToTheEnd(): Boolean =
 fun NewsList(
     newsList: List<NetEaseNewsItem>,
     listState: LazyListState = rememberLazyListState(),
-    lastEvent: ((Boolean) -> Unit)? = null,
-    itemClick: (url: String) -> Unit
+    lastEvent: (() -> Unit)? = null,
+    itemClick: (url: String) -> Unit,
+    emptyBtnClick: (() -> Unit)? = null
 ) {
+    if (newsList.isEmpty()) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background),
+            contentAlignment = Alignment.Center
+        ) {
+            Button(onClick = {
+                emptyBtnClick?.let {
+                    it()
+                }
+            }) {
+                Text(text = stringResource(id = R.string.reload))
+            }
+
+        }
+
+        return
+    }
     LazyColumn(
         state = listState,
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.listBack)
     ) {
-        items(newsList) { item ->
-            NewsItem(newsItem = item, itemClick)
-        }
+        items(newsList) { item -> NewsItem(newsItem = item, itemClick) }
         item {
             Row(
                 Modifier
@@ -63,9 +81,13 @@ fun NewsList(
                 )
             }
         }
-
     }
-    lastEvent?.let { it(listState.isScrolledToTheEnd()) }
+    //当列表划到最后时
+    lastEvent?.let {
+        if (listState.isScrolledToTheEnd()) {
+            it()
+        }
+    }
 }
 
 @ExperimentalCoilApi

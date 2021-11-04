@@ -32,7 +32,6 @@ import com.yuan.looker.ui.composable.NewsList
 import com.yuan.looker.ui.theme.statusBar
 import com.yuan.looker.utils.sealed.Screen
 import com.yuan.looker.viewmodel.NewsViewModel
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -135,12 +134,11 @@ fun MainScreen(context: MainActivity) {
             context.launch {
                 if (viewModel.load) {
                     viewModel.message(R.string.loading)
+                } else {
+                    viewModel.newsIndex = 0
+                    viewModel.loadNews(viewModel.selectedTab)
                     swipeRefreshState.isRefreshing = false
-                    return@launch
                 }
-                viewModel.newsIndex = 0
-                viewModel.loadNews(viewModel.selectedTab)
-                swipeRefreshState.isRefreshing = false
             }
         }
 
@@ -151,35 +149,37 @@ fun MainScreen(context: MainActivity) {
                 selected = (viewModel.selectedTab == self),
                 onClick = {
                     //双击跳转到列表顶部
-                    context.launch {
-                        clickTimes += 1
-                        delay(500)
-                        if (clickTimes != 0) {
-                            clickTimes = 0
-                        }
-                    }
-                    if (clickTimes >= 1) {
-                        clickTimes = 0
+                    if (viewModel.news.isNotEmpty()) {
                         context.launch {
-                            lazyListState.scrollToItem(0)
+                            clickTimes += 1
+                            delay(500)
+                            if (clickTimes != 0) {
+                                clickTimes = 0
+                            }
+                        }
+                        if (clickTimes >= 1) {
+                            clickTimes = 0
+                            context.launch {
+                                lazyListState.scrollToItem(0)
+                            }
                         }
                     }
                     /**********************************************/
                     if (viewModel.selectedTab != self) {
                         viewModel.selectedTab = self
-                        viewModel.newsIndex = 0
-                        viewModel.load = false
                         context.launch {
-                            viewModel.loadNews(self)
-                            lazyListState.scrollToItem(1)
-                            cancel()
+                            reloadNews()
                         }
                     }
                 },
                 text = { Text(text = label) })
         }
 
-        Column(Modifier.fillMaxSize(), horizontalAlignment = CenterHorizontally) {
+        Column(
+            Modifier.fillMaxSize(),
+            horizontalAlignment = CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             SwipeRefresh(
                 state = swipeRefreshState,
                 indicator = { state, trigger ->
@@ -204,11 +204,9 @@ fun MainScreen(context: MainActivity) {
                     NewsList(
                         newsList = viewModel.news,
                         listState = lazyListState,
-                        lastEvent = { isLast ->
+                        lastEvent = {
                             context.launch {
-                                if (!viewModel.load) {
-                                    if (isLast) viewModel.loadNews(viewModel.selectedTab)
-                                }
+                                viewModel.loadNews(viewModel.selectedTab)
                             }
                         },
                         itemClick = { newsID ->
@@ -219,6 +217,9 @@ fun MainScreen(context: MainActivity) {
                                 viewModel.loadContent()
                             }
                             context.navController.navigate(Screen.ReadScreen.route)
+                        },
+                        emptyBtnClick = {
+                            reloadNews()
                         })
                 }
             }
