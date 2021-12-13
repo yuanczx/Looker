@@ -7,11 +7,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.yuan.looker.R
 import com.yuan.looker.model.NetEaseNewsItem
 import com.yuan.looker.ui.theme.*
 import com.yuan.looker.utils.MyRetrofit
 import com.yuan.looker.utils.sealed.Sort
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import retrofit2.awaitResponse
 import java.net.UnknownHostException
 
@@ -86,12 +89,20 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
 
     fun arrayRes(id: Int): Array<String> = context().resources.getStringArray(id)
 
-    private fun stringRes(id: Int) = context().getString(id)
+    // private fun stringRes(id: Int) = context().getString(id)
 
+    private var toastShowing = false
     fun message(msgID: Int) {
+        if (toastShowing) return
         toast.setText(msgID)
         toast.duration = Toast.LENGTH_SHORT
         toast.show()
+        toastShowing = true
+        viewModelScope.launch {
+            delay(1500)
+            toast.cancel()
+            toastShowing = false
+        }
     }
 
     //加载新闻
@@ -166,7 +177,6 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
                         ) + "</div></body></html>"
                     s
                 }
-                Log.d("html", currentNews)
                 contentLoad = false
             }
         } catch (e: Exception) {
